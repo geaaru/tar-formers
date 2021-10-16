@@ -19,8 +19,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package specs
 
 import (
+	"io/ioutil"
+	"strings"
+
 	"gopkg.in/yaml.v2"
 )
+
+func NewSpecFile() *SpecFile {
+	return &SpecFile{
+		MatchPrefix: []string{},
+		IgnoreFiles: []string{},
+		Rename:      []RenameRule{},
+		RemapUids:   make(map[string]string, 0),
+		RemapGids:   make(map[string]string, 0),
+		RemapUsers:  make(map[string]string, 0),
+		RemapGroups: make(map[string]string, 0),
+
+		SameOwner:   true,
+		SameChtimes: false,
+		MapEntities: false,
+	}
+}
 
 func NewSpecFileFromYaml(data []byte, f string) (*SpecFile, error) {
 	ans := &SpecFile{}
@@ -31,4 +50,50 @@ func NewSpecFileFromYaml(data []byte, f string) (*SpecFile, error) {
 	ans.File = f
 
 	return ans, nil
+}
+
+func NewSpecFileFromFile(file string) (*SpecFile, error) {
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewSpecFileFromYaml(data, file)
+}
+
+func (s *SpecFile) IsPath2Skip(resource string) bool {
+	ans := false
+
+	if len(s.MatchPrefix) > 0 {
+		for _, p := range s.MatchPrefix {
+			if strings.HasPrefix(resource, p) {
+				ans = true
+				break
+			}
+		}
+
+		ans = !ans
+	}
+
+	if len(s.IgnoreFiles) > 0 && !ans {
+		for _, f := range s.IgnoreFiles {
+			if f == resource {
+				ans = true
+				break
+			}
+		}
+	}
+
+	return ans
+}
+
+func (s *SpecFile) GetRename(file string) string {
+	if len(s.Rename) > 0 {
+		for _, r := range s.Rename {
+			if r.Source == file {
+				return r.Dest
+			}
+		}
+	}
+	return file
 }

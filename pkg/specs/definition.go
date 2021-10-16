@@ -25,9 +25,20 @@ import (
 type SpecFile struct {
 	File string `yaml:"-" json:"-"`
 
-	Ignore []string `yaml:"ignore,omitempty" json:"ignore,omitempty"`
+	// Define the list of prefixes of the path to
+	MatchPrefix []string `yaml:"match_prefix,omitempty" json:"match_prefix,omitempty"`
+	IgnoreFiles []string `yaml:"ignore_files,omitempty" json:"ignore_files,omitempty"`
 
 	Rename []RenameRule `yaml:"rename,omitempty" json:"rename,omitempty"`
+
+	RemapUids   map[string]string `yaml:"remap_uids,omitempty" json:"remap_uids,omitempty"`
+	RemapGids   map[string]string `yaml:"remap_gids,omitempty" json:"remap_gids,omitempty"`
+	RemapUsers  map[string]string `yaml:"remap_users,omitempty" json:"remap_users,omitempty"`
+	RemapGroups map[string]string `yaml:"remap_groups,omitempty" json:"remap_groups,omitempty"`
+
+	SameOwner   bool `yaml:"same_owner,omitempty" json:"same_owner,omitempty"`
+	SameChtimes bool `yaml:"same_chtimes,omitempty" json:"same_chtimes,omitempty"`
+	MapEntities bool `yaml:"map_entities,omitempty" json:"map_entities,omitempty"`
 }
 
 type RenameRule struct {

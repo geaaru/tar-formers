@@ -29,9 +29,10 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func (t *TarFormers) CreateFile(file string, mode os.FileMode, reader *tar.Reader, header *tar.Header) error {
+func (t *TarFormers) CreateFile(dir string, mode os.FileMode, reader *tar.Reader, header *tar.Header) error {
 
-	fmt.Println("Creating file", file, "...")
+	file := t.Task.GetRename("/" + header.Name)
+	file = filepath.Join(dir, file)
 
 	err := t.CreateDir(filepath.Dir(file), mode|os.ModeDir|100)
 	if err != nil {
@@ -57,12 +58,34 @@ func (t *TarFormers) CreateFile(file string, mode os.FileMode, reader *tar.Reade
 				file, nb, header.Size))
 	}
 
-	fmt.Println("Written ", nb)
+	t.Logger.Debug(fmt.Sprintf(
+		"Created file %s (size %d).", file, nb))
 
 	// TODO: check if it's needed f.Sync()
-	// 	if err := f.Sync(); err != nil {
+	//if err := f.Sync(); err != nil {
 	//	return err
 	//}
+
+	return nil
+}
+
+func (t *TarFormers) SetFileProps(path string, header *tar.Header) error {
+	if t.Task.SameOwner {
+		if err := os.Chown(path, header.Uid, header.Gid); err != nil {
+			return errors.New(
+				fmt.Sprintf("For path %s error on chown: %s",
+					path, err.Error()))
+		}
+	}
+
+	// maintaining access and modification time in best effort fashion
+	if t.Task.SameChtimes {
+		err := os.Chtimes(path, header.AccessTime, header.ModTime)
+		if err != nil {
+			t.Logger.Warning(
+				"[%s] Error on chtimes: %s", path, err.Error())
+		}
+	}
 
 	return nil
 }

@@ -38,8 +38,6 @@ type Config struct {
 
 type CGeneral struct {
 	Debug bool `mapstructure:"debug,omitempty" json:"debug,omitempty" yaml:"debug,omitempty"`
-
-	MaintainChTimes bool `mapstructure:"maintain_chtims,omitempty" json:"maintain_chtims,omitempty" yaml:"maintain_chtims,omitempty"`
 }
 
 type CLogging struct {
@@ -90,7 +88,6 @@ func (c *Config) Yaml() ([]byte, error) {
 
 func GenDefault(viper *v.Viper) {
 	viper.SetDefault("general.debug", false)
-	viper.SetDefault("general.maintain_chtims", false)
 
 	viper.SetDefault("logging.level", "info")
 	viper.SetDefault("logging.enable_logfile", false)

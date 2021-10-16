@@ -30,10 +30,26 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func exporDockerContainer(tarformers *executor.TarFormers, cid, dir string) {
+func exporDockerContainer(tarformers *executor.TarFormers, cid, dir, spec string) {
+	var s *specs.SpecFile = nil
+	var err error
+
 	cmds := []string{
 		"/bin/bash", "-c",
 		"docker export " + cid,
+	}
+
+	if spec != "" {
+		s, err = specs.NewSpecFileFromFile(spec)
+		if err != nil {
+			fmt.Println(fmt.Sprintf(
+				"Error on read file %s: %s",
+				spec, err.Error()))
+			os.Exit(1)
+		}
+	} else {
+		s = specs.NewSpecFile()
+		s.IgnoreFiles = append(s.IgnoreFiles, "/.dockerenv")
 	}
 
 	hostCommand := exec.Command(cmds[0], cmds[1:]...)
@@ -53,10 +69,7 @@ func exporDockerContainer(tarformers *executor.TarFormers, cid, dir string) {
 		os.Exit(1)
 	}
 
-	err = tarformers.RunTask(
-		&specs.SpecFile{},
-		dir,
-	)
+	err = tarformers.RunTask(s, dir)
 	if err != nil {
 		fmt.Println("Error on process tarball :" + err.Error())
 		os.Exit(1)
@@ -69,7 +82,11 @@ func exporDockerContainer(tarformers *executor.TarFormers, cid, dir string) {
 	}
 
 	res := hostCommand.ProcessState.ExitCode()
-	fmt.Println("Exiting with ", res)
+	if res != 0 {
+		fmt.Println("Exporting exit with ", res)
+	} else {
+		fmt.Println("Operation completed.")
+	}
 
 	os.Exit(0)
 }
@@ -94,17 +111,19 @@ func newDockerExportCommand(config *specs.Config) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			to, _ := cmd.Flags().GetString("to")
+			specfile, _ := cmd.Flags().GetString("specs")
 
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
 
-			exporDockerContainer(tarformers, args[0], to)
+			exporDockerContainer(tarformers, args[0], to, specfile)
 
 		},
 	}
 
 	flags := cmd.Flags()
-	flags.String("to", "", "Export directory")
+	flags.String("to", "", "Export directory where untar files.")
+	flags.String("specs", "", "Define a spec file with the rules to follow.")
 
 	return cmd
 }
