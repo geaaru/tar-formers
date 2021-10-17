@@ -98,9 +98,9 @@ same_chtimes: true
 
 ### Know Issues
 
-There are very corner cases where are used hardlinks that are linked
-between their. In this case a good solution is try to order the
-creation of these files to ensure the correct creation.
+There are very corner cases where are used hardlinks that are linked between them.
+In this case a good solution is to try to order the creation of these files to
+ensure the correct creation.
 
 ATM, i found only one condition with this problem: the mesa-libs.
 
