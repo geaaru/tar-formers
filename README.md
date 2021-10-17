@@ -1,6 +1,30 @@
 # tar-formers
 A library and tool to modify tar flows at runtime
 
+```bash
+$> tar-formers --help
+Copyright (c) 2021 - Daniele Rondina
+
+Tar-formers - A golang tool to control tar flows
+
+Usage:
+   [command]
+
+Available Commands:
+  completion    generate the autocompletion script for the specified shell
+  docker-export Export a docker container files to a specified directory.
+  help          Help about any command
+  portal        Extract a stdin flow or a tar file to a specified directory.
+
+Flags:
+  -c, --config string   Tarformers configuration file
+  -d, --debug           Enable debug output.
+  -h, --help            help for this command
+  -v, --version         version for this command
+
+Use " [command] --help" for more information about a command.
+```
+
 ## Export docker container and apply filter
 
 ```bash
@@ -16,7 +40,7 @@ can't use it with map_entities feature.
 ## Extract tar flow related to a specific rules from stdin
 
 ```bash
-$> tar -cpf - ./pkg | tar-formers portal --stdin --to ./tmp
+$> tar -cpf - ./pkg | tar-formers portal --stdin --specs rules.yaml --to ./tmp
 ```
 
 ## Extract tar flow related to a specific rules from file
