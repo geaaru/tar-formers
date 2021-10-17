@@ -35,7 +35,7 @@ const (
 Tar-formers - A golang tool to control tar flows
 `
 
-	TARFORMERS_VERSION = `0.0.1`
+	TARFORMERS_VERSION = `0.1.0`
 )
 
 // Build time and commit information. This code is get from: https://github.com/mudler/luet/
@@ -68,7 +68,7 @@ func initConfig(config *specs.Config) {
 func initCommand(rootCmd *cobra.Command, config *specs.Config) {
 	var pflags = rootCmd.PersistentFlags()
 
-	pflags.StringP("config", "c", "", "Tarformer configuration file")
+	pflags.StringP("config", "c", "", "Tarformers configuration file")
 	pflags.BoolP("debug", "d", config.Viper.GetBool("general.debug"),
 		"Enable debug output.")
 
@@ -77,6 +77,7 @@ func initCommand(rootCmd *cobra.Command, config *specs.Config) {
 
 	rootCmd.AddCommand(
 		newDockerExportCommand(config),
+		newPortalCommand(config),
 	)
 }
 
