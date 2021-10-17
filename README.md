@@ -7,12 +7,11 @@ A library and tool to modify tar flows at runtime
 $> tar-formers docker-export <container-id> --to ./tmp
 ```
 
----
-** NOTE **
+***
 The `docker export` command at the moment doesn't set the
 Uname and Gname attribute of the tarball flow so, you
 can't use it with map_entities feature.
----
+***
 
 ## Extract tar flow related to a specific rules from stdin
 
