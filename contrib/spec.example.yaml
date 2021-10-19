@@ -36,3 +36,6 @@ same_chtimes: true
 # Using the user/group names present on tar header and resolve it.
 # Not yet implemented.
 # map_entities: false
+
+# Warning on create hardlink and sym
+broken_links_fatal: false
