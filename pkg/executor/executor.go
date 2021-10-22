@@ -35,12 +35,22 @@ import (
 // between different TarFormers running.
 var mutex sync.Mutex
 
+type TarFileOperation struct {
+	Rename  bool
+	NewName string
+	Skip    bool
+}
+
+// Function handler to
+type TarFileHandlerFunc func(path, dst string,
+	header *tar.Header, content io.Reader, opts *TarFileOperation) error
+
 type TarFormers struct {
 	Config *specs.Config `yaml:"config" json:"config"`
 	Logger *log.Logger   `yaml:"-" json:"-"`
 
-	reader      io.Reader                `yaml:"-" json:"-"`
-	fileHandler specs.TarFileHandlerFunc `yaml:"-" json:"-"`
+	reader      io.Reader          `yaml:"-" json:"-"`
+	fileHandler TarFileHandlerFunc `yaml:"-" json:"-"`
 
 	Task      *specs.SpecFile `yaml:"task,omitempty" json:"task,omitempty"`
 	ExportDir string          `yaml:"export_dir,omitempty" json:"export_dir,omitempty"`
@@ -77,7 +87,7 @@ func (t *TarFormers) HasFileHandler() bool {
 	}
 }
 
-func (t *TarFormers) SetFileHandler(f specs.TarFileHandlerFunc) {
+func (t *TarFormers) SetFileHandler(f TarFileHandlerFunc) {
 	t.fileHandler = f
 }
 
@@ -135,7 +145,7 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 		// Call file handler also for file that could be skipped and permit
 		// to notify this to users.
 		if t.HasFileHandler() {
-			opts := specs.TarFileOperation{
+			opts := TarFileOperation{
 				Rename:  false,
 				NewName: "",
 				Skip:    false,

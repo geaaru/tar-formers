@@ -19,8 +19,6 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package specs
 
 import (
-	"archive/tar"
-	"io"
 	"os"
 	"time"
 )
@@ -70,13 +68,3 @@ type Link struct {
 	Mode     os.FileMode
 	Meta     FileMeta
 }
-
-type TarFileOperation struct {
-	Rename  bool
-	NewName string
-	Skip    bool
-}
-
-// Function handler to
-type TarFileHandlerFunc func(path, dst string,
-	header *tar.Header, content io.Reader, opts *TarFileOperation) error
