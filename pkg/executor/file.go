@@ -109,23 +109,45 @@ func (t *TarFormers) SetFileProps(path string, meta *specs.FileMeta, link bool) 
 		}
 	}
 
-	for key, value := range meta.Xattrs {
-		t.Logger.Debug(
-			fmt.Sprintf("[%s] Setting xattr %s with value %s.",
-				path, key, string(value)))
-		if err := unix.Lsetxattr(path, key, []byte(value), 0); err != nil {
-			if err == syscall.ENOTSUP || err == syscall.EPERM {
-				// We ignore errors here because not all graphdrivers support
-				// xattrs *cough* old versions of AUFS *cough*. However only
-				// ENOTSUP should be emitted in that case, otherwise we still
-				// bail.
-				// EPERM occurs if modifying xattrs is not allowed. This can
-				// happen when running in userns with restrictions (ChromeOS).
-				t.Logger.Warning(
-					"[%s] Ignoring xattr %s not supported by the underlying filesystem: %s",
-					path, key, err.Error())
-				continue
+	if len(meta.Xattrs) > 0 {
+		for key, value := range meta.Xattrs {
+			err := t.SetXattrAttr(path, key, value, 0)
+			if err != nil {
+				return err
 			}
+		}
+	}
+
+	if len(meta.PAXRecords) > 0 {
+		// NOTE: using PAX extend header like xattr. To verify.
+		for key, value := range meta.PAXRecords {
+			err := t.SetXattrAttr(path, key, value, 0)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (t *TarFormers) SetXattrAttr(path, k, v string, flag int) error {
+	t.Logger.Debug(
+		fmt.Sprintf("[%s] Setting xattr %s with value %s.",
+			path, k, string(v)))
+
+	if err := unix.Lsetxattr(path, k, []byte(v), 0); err != nil {
+		if err == syscall.ENOTSUP || err == syscall.EPERM {
+			// We ignore errors here because not all graphdrivers support
+			// xattrs *cough* old versions of AUFS *cough*. However only
+			// ENOTSUP should be emitted in that case, otherwise we still
+			// bail.
+			// EPERM occurs if modifying xattrs is not allowed. This can
+			// happen when running in userns with restrictions (ChromeOS).
+			t.Logger.Warning(
+				"[%s] Ignoring xattr %s not supported by the underlying filesystem: %s",
+				path, k, err.Error())
+		} else {
 			return err
 		}
 	}
