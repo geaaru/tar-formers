@@ -235,6 +235,8 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 			if err != nil {
 				return err
 			}
+
+			// TODO: check if call setProps to links files too.
 		}
 	}
 
