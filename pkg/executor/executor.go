@@ -46,7 +46,8 @@ type TarFileOperation struct {
 
 // Function handler to
 type TarFileHandlerFunc func(path, dst string,
-	header *tar.Header, content io.Reader, opts *TarFileOperation) error
+	header *tar.Header, content io.Reader,
+	opts *TarFileOperation, t *TarFormers) error
 
 type TarFormers struct {
 	Config *specs.Config `yaml:"config" json:"config"`
@@ -136,6 +137,8 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 		dir = dir + "/"
 	}
 
+	t.Task.Prepare()
+
 	for {
 		header, err := tarReader.Next()
 
@@ -155,14 +158,14 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 
 		// Call file handler also for file that could be skipped and permit
 		// to notify this to users.
-		if t.HasFileHandler() {
+		if t.HasFileHandler() && t.Task.IsFileTriggered(absPath) {
 			opts := TarFileOperation{
 				Rename:  false,
 				NewName: "",
 				Skip:    false,
 			}
 
-			err := t.fileHandler(absPath, dir, header, tarReader, &opts)
+			err := t.fileHandler(absPath, dir, header, tarReader, &opts, t)
 			if err != nil {
 				return err
 			}

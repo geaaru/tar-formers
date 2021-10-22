@@ -26,9 +26,17 @@ import (
 type SpecFile struct {
 	File string `yaml:"-" json:"-"`
 
-	// Define the list of prefixes of the path to
+	// Define the list of prefixes of the path to extract
 	MatchPrefix []string `yaml:"match_prefix,omitempty" json:"match_prefix,omitempty"`
+	// Define the list of files to ignore/skip.
+
 	IgnoreFiles []string `yaml:"ignore_files,omitempty" json:"ignore_files,omitempty"`
+
+	// If the user handler is set. Permit to define the list of the file where
+	// is called the user handler function. If this list is empty it calls
+	// the callback every times (and TriggeredMatchesPrefix)
+	TriggeredFiles         []string `yaml:"triggered_files,omitempty" json:"triggered_files,omitempty"`
+	TriggeredMatchesPrefix []string `yaml:"triggered_matches_prefix,omitempty json:"triggered_matches_prefix,omitempty"`
 
 	Rename []RenameRule `yaml:"rename,omitempty" json:"rename,omitempty"`
 
@@ -42,6 +50,8 @@ type SpecFile struct {
 	MapEntities      bool `yaml:"map_entities,omitempty" json:"map_entities,omitempty"`
 	BrokenLinksFatal bool `yaml:"broken_links_fatal,omitempty" json:"broken_links_fatal,omitempty"`
 	EnableMutex      bool `yaml:"enable_mutex,omitempty" json:"enable_mutex,omitempty"`
+
+	mapModifier map[string]bool `yaml:"-" json:"-"`
 }
 
 type RenameRule struct {

@@ -40,6 +40,8 @@ func NewSpecFile() *SpecFile {
 		MapEntities:      false,
 		BrokenLinksFatal: false,
 		EnableMutex:      false,
+
+		mapModifier: make(map[string]bool, 0),
 	}
 }
 
@@ -61,6 +63,39 @@ func NewSpecFileFromFile(file string) (*SpecFile, error) {
 	}
 
 	return NewSpecFileFromYaml(data, file)
+}
+
+func (s *SpecFile) IsFileTriggered(path string) bool {
+	if len(s.TriggeredFiles) == 0 && len(s.TriggeredMatchesPrefix) == 0 {
+		return true
+	}
+
+	if len(s.TriggeredFiles) > 0 {
+		if _, p := s.mapModifier[path]; p {
+			return true
+		}
+	}
+
+	if len(s.TriggeredMatchesPrefix) > 0 {
+		for _, p := range s.TriggeredMatchesPrefix {
+			if strings.HasPrefix(path, p) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (s *SpecFile) Prepare() {
+	// Creating map to speedup research
+	s.mapModifier = make(map[string]bool, 0)
+
+	if len(s.TriggeredFiles) > 0 {
+		for _, f := range s.TriggeredFiles {
+			s.mapModifier[f] = true
+		}
+	}
 }
 
 func (s *SpecFile) IsPath2Skip(resource string) bool {
