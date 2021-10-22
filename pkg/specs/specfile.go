@@ -146,6 +146,8 @@ func NewFileMeta(header *tar.Header) FileMeta {
 		ans.ModTime = header.ModTime
 		ans.AccessTime = header.AccessTime
 		ans.ChangeTime = header.ChangeTime
+		ans.Xattrs = header.Xattrs
+		ans.PAXRecords = header.PAXRecords
 	}
 	return ans
 }

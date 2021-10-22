@@ -105,7 +105,28 @@ func (t *TarFormers) SetFileProps(path string, meta *specs.FileMeta, link bool) 
 		err := os.Chtimes(path, meta.AccessTime, meta.ModTime)
 		if err != nil {
 			t.Logger.Warning(
-				"[%s] Error on chtimes: %s", path, err.Error())
+				fmt.Sprintf("[%s] Error on chtimes: %s", path, err.Error()))
+		}
+	}
+
+	for key, value := range meta.Xattrs {
+		t.Logger.Debug(
+			fmt.Sprintf("[%s] Setting xattr %s with value %s.",
+				path, key, string(value)))
+		if err := unix.Lsetxattr(path, key, []byte(value), 0); err != nil {
+			if err == syscall.ENOTSUP || err == syscall.EPERM {
+				// We ignore errors here because not all graphdrivers support
+				// xattrs *cough* old versions of AUFS *cough*. However only
+				// ENOTSUP should be emitted in that case, otherwise we still
+				// bail.
+				// EPERM occurs if modifying xattrs is not allowed. This can
+				// happen when running in userns with restrictions (ChromeOS).
+				t.Logger.Warning(
+					"[%s] Ignoring xattr %s not supported by the underlying filesystem: %s",
+					path, key, err.Error())
+				continue
+			}
+			return err
 		}
 	}
 

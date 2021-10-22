@@ -68,6 +68,9 @@ type FileMeta struct {
 	ModTime    time.Time // Modification time
 	AccessTime time.Time // Access time
 	ChangeTime time.Time // Change time
+
+	Xattrs     map[string]string // extend attributes
+	PAXRecords map[string]string // PAX extend headers records
 }
 
 type Link struct {
