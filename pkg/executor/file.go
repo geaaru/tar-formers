@@ -83,18 +83,26 @@ func (t *TarFormers) ExistFile(path string) (bool, error) {
 	return true, nil
 }
 
-func (t *TarFormers) SetFileProps(path string, header *tar.Header) error {
+func (t *TarFormers) SetFileProps(path string, meta *specs.FileMeta, link bool) error {
 	if t.Task.SameOwner {
-		if err := os.Chown(path, header.Uid, header.Gid); err != nil {
-			return errors.New(
-				fmt.Sprintf("For path %s error on chown: %s",
-					path, err.Error()))
+		if link {
+			if err := os.Lchown(path, meta.Uid, meta.Gid); err != nil {
+				return errors.New(
+					fmt.Sprintf("For path %s error on chown: %s",
+						path, err.Error()))
+			}
+		} else {
+			if err := os.Chown(path, meta.Uid, meta.Gid); err != nil {
+				return errors.New(
+					fmt.Sprintf("For path %s error on chown: %s",
+						path, err.Error()))
+			}
 		}
 	}
 
 	// maintaining access and modification time in best effort fashion
 	if t.Task.SameChtimes {
-		err := os.Chtimes(path, header.AccessTime, header.ModTime)
+		err := os.Chtimes(path, meta.AccessTime, meta.ModTime)
 		if err != nil {
 			t.Logger.Warning(
 				"[%s] Error on chtimes: %s", path, err.Error())

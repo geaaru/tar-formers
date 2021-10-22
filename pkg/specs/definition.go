@@ -22,6 +22,7 @@ import (
 	"archive/tar"
 	"io"
 	"os"
+	"time"
 )
 
 type SpecFile struct {
@@ -50,15 +51,24 @@ type RenameRule struct {
 	Dest   string `yaml:"dest" json:"dest"`
 }
 
+type FileMeta struct {
+	Uid   int    // User ID of owner
+	Gid   int    // Group ID of owner
+	Uname string // User name of owner
+	Gname string // Group name of owner
+
+	ModTime    time.Time // Modification time
+	AccessTime time.Time // Access time
+	ChangeTime time.Time // Change time
+}
+
 type Link struct {
-	// Contains the path of the link to create (header.Name)
-	Name string
-	// Contains the path of the path linked to this link (header.Linkname)
-	Linkname string
-	// Contains the target path merged to the destination path that must be creatd.
-	Path     string
+	Name     string // Contains the path of the link to create (header.Name)
+	Linkname string // Contains the path of the path linked to this link (header.Linkname)
+	Path     string // Contains the target path merged to the destination path that must be creatd.
 	TypeFlag byte
 	Mode     os.FileMode
+	Meta     FileMeta
 }
 
 type TarFileOperation struct {
