@@ -32,7 +32,7 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-func (t *TarFormers) CreateFile(dir, name string, mode os.FileMode, reader *tar.Reader, header *tar.Header) error {
+func (t *TarFormers) CreateFile(dir, name string, mode os.FileMode, reader io.Reader, header *tar.Header) error {
 
 	file := t.Task.GetRename("/" + name)
 	file = filepath.Join(dir, file)
