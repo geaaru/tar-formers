@@ -220,15 +220,7 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 					Name:     name,
 					Mode:     info.Mode(),
 					TypeFlag: header.Typeflag,
-					Meta: specs.FileMeta{
-						Uid:        header.Uid,
-						Gid:        header.Gid,
-						Uname:      header.Uname,
-						Gname:      header.Gname,
-						ModTime:    header.ModTime,
-						AccessTime: header.AccessTime,
-						ChangeTime: header.ChangeTime,
-					},
+					Meta:     specs.NewFileMeta(header),
 				})
 		case tar.TypeSymlink:
 			t.Logger.Debug(fmt.Sprintf("Path %s is a symlink to %s.",
@@ -240,15 +232,7 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 					Name:     name,
 					Mode:     info.Mode(),
 					TypeFlag: header.Typeflag,
-					Meta: specs.FileMeta{
-						Uid:        header.Uid,
-						Gid:        header.Gid,
-						Uname:      header.Uname,
-						Gname:      header.Gname,
-						ModTime:    header.ModTime,
-						AccessTime: header.AccessTime,
-						ChangeTime: header.ChangeTime,
-					},
+					Meta:     specs.NewFileMeta(header),
 				})
 		case tar.TypeChar, tar.TypeBlock:
 			err := t.CreateBlockCharFifo(targetPath, info.Mode(), header)
@@ -261,16 +245,8 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 		// Set this an option
 		switch header.Typeflag {
 		case tar.TypeDir, tar.TypeReg, tar.TypeRegA, tar.TypeBlock, tar.TypeFifo:
-			meta := &specs.FileMeta{
-				Uid:        header.Uid,
-				Gid:        header.Gid,
-				Uname:      header.Uname,
-				Gname:      header.Gname,
-				ModTime:    header.ModTime,
-				AccessTime: header.AccessTime,
-				ChangeTime: header.ChangeTime,
-			}
-			err := t.SetFileProps(targetPath, meta, false)
+			meta := specs.NewFileMeta(header)
+			err := t.SetFileProps(targetPath, &meta, false)
 			if err != nil {
 				return err
 			}

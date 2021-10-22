@@ -19,6 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package specs
 
 import (
+	"archive/tar"
 	"io/ioutil"
 	"strings"
 
@@ -133,4 +134,18 @@ func (s *SpecFile) GetRename(file string) string {
 		}
 	}
 	return file
+}
+
+func NewFileMeta(header *tar.Header) FileMeta {
+	ans := FileMeta{}
+	if header != nil {
+		ans.Uid = header.Uid
+		ans.Gid = header.Gid
+		ans.Uname = header.Uname
+		ans.Gname = header.Gname
+		ans.ModTime = header.ModTime
+		ans.AccessTime = header.AccessTime
+		ans.ChangeTime = header.ChangeTime
+	}
+	return ans
 }
