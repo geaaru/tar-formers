@@ -39,7 +39,8 @@ type TarFormers struct {
 	Config *specs.Config `yaml:"config" json:"config"`
 	Logger *log.Logger   `yaml:"-" json:"-"`
 
-	reader io.Reader `yaml:"-" json:"-"`
+	reader      io.Reader                `yaml:"-" json:"-"`
+	fileHandler specs.TarFileHandlerFunc `yaml:"-" json:"-"`
 
 	Task      *specs.SpecFile `yaml:"task,omitempty" json:"task,omitempty"`
 	ExportDir string          `yaml:"export_dir,omitempty" json:"export_dir,omitempty"`
@@ -66,6 +67,18 @@ func NewTarFormers(config *specs.Config) *TarFormers {
 
 func (t *TarFormers) SetReader(reader io.Reader) {
 	t.reader = reader
+}
+
+func (t *TarFormers) HasFileHandler() bool {
+	if t.fileHandler != nil {
+		return true
+	} else {
+		return false
+	}
+}
+
+func (t *TarFormers) SetFileHandler(f specs.TarFileHandlerFunc) {
+	t.fileHandler = f
 }
 
 func (t *TarFormers) RunTask(task *specs.SpecFile, dir string) error {
@@ -116,15 +129,48 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 		}
 
 		absPath := "/" + header.Name
+		targetPath := filepath.Join(dir, header.Name)
+		name := header.Name
+
+		// Call file handler also for file that could be skipped and permit
+		// to notify this to users.
+		if t.HasFileHandler() {
+			opts := specs.TarFileOperation{
+				Rename:  false,
+				NewName: "",
+				Skip:    false,
+			}
+
+			err := t.fileHandler(absPath, dir, header, tarReader, &opts)
+			if err != nil {
+				return err
+			}
+
+			if opts.Skip {
+				t.Logger.Debug(fmt.Sprintf("File %s skipped.", header.Name))
+				continue
+			}
+
+			if opts.Rename {
+				name = opts.NewName
+				if strings.HasPrefix(name, "/") {
+					absPath = name
+				} else {
+					absPath = "/" + name
+				}
+
+				targetPath = filepath.Join(dir, name)
+			}
+		}
+
 		if t.Task.IsPath2Skip(absPath) {
-			t.Logger.Debug(fmt.Sprintf("File %s skipped.", header.Name))
+			t.Logger.Debug(fmt.Sprintf("File %s skipped.", name))
 			continue
 		}
 
 		t.Logger.Debug(fmt.Sprintf("Parsing file %s [%s - %d, %s - %d] (%s).",
-			header.Name, header.Uname, header.Uid, header.Gname, header.Gid, header.Linkname))
+			name, header.Uname, header.Uid, header.Gname, header.Gid, header.Linkname))
 
-		targetPath := filepath.Join(dir, header.Name)
 		info := header.FileInfo()
 
 		switch header.Typeflag {
@@ -136,29 +182,29 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 						targetPath, err.Error()))
 			}
 		case tar.TypeReg, tar.TypeRegA:
-			err := t.CreateFile(dir, info.Mode(), tarReader, header)
+			err := t.CreateFile(dir, name, info.Mode(), tarReader, header)
 			if err != nil {
 				return err
 			}
 		case tar.TypeLink:
 			t.Logger.Debug(fmt.Sprintf("Path %s is a hardlink to %s.",
-				header.Name, header.Linkname))
+				name, header.Linkname))
 			links = append(links,
 				specs.Link{
 					Path:     targetPath,
 					Linkname: filepath.Join(dir, header.Linkname),
-					Name:     header.Name,
+					Name:     name,
 					Mode:     info.Mode(),
 					TypeFlag: header.Typeflag,
 				})
 		case tar.TypeSymlink:
 			t.Logger.Debug(fmt.Sprintf("Path %s is a symlink to %s.",
-				header.Name, header.Linkname))
+				name, header.Linkname))
 			links = append(links,
 				specs.Link{
 					Path:     targetPath,
 					Linkname: header.Linkname,
-					Name:     header.Name,
+					Name:     name,
 					Mode:     info.Mode(),
 					TypeFlag: header.Typeflag,
 				})
