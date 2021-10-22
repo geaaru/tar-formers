@@ -35,6 +35,9 @@ import (
 // between different TarFormers running.
 var mutex sync.Mutex
 
+// Default Tarformers Robot instance
+var optimusPrime *TarFormers = nil
+
 type TarFileOperation struct {
 	Rename  bool
 	NewName string
@@ -54,6 +57,14 @@ type TarFormers struct {
 
 	Task      *specs.SpecFile `yaml:"task,omitempty" json:"task,omitempty"`
 	ExportDir string          `yaml:"export_dir,omitempty" json:"export_dir,omitempty"`
+}
+
+func SetDefaultTarFormers(t *TarFormers) {
+	optimusPrime = t
+}
+
+func GetOptimusPrime() *TarFormers {
+	return optimusPrime
 }
 
 func NewTarFormers(config *specs.Config) *TarFormers {
