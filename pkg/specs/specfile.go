@@ -39,6 +39,7 @@ func NewSpecFile() *SpecFile {
 		SameChtimes:      false,
 		MapEntities:      false,
 		BrokenLinksFatal: false,
+		EnableMutex:      false,
 	}
 }
 

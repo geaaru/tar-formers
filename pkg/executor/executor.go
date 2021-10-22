@@ -25,10 +25,15 @@ import (
 	"io"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	log "github.com/geaaru/tar-formers/pkg/logger"
 	specs "github.com/geaaru/tar-formers/pkg/specs"
 )
+
+// Mutex must be global to ensure mutual exclusion
+// between different TarFormers running.
+var mutex sync.Mutex
 
 type TarFormers struct {
 	Config *specs.Config `yaml:"config" json:"config"`
