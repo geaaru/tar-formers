@@ -192,10 +192,10 @@ func (t *TarFormers) HandleTarFlow(tarReader *tar.Reader, dir string) error {
 			continue
 		}
 
-		t.Logger.Debug(fmt.Sprintf("Parsing file %s [%s - %d, %s - %d] (%s).",
-			name, header.Uname, header.Uid, header.Gname, header.Gid, header.Linkname))
-
 		info := header.FileInfo()
+
+		t.Logger.Debug(fmt.Sprintf("Parsing file %s [%s - %d, %s - %d] %s (%s).",
+			name, header.Uname, header.Uid, header.Gname, header.Gid, info.Mode(), header.Linkname))
 
 		switch header.Typeflag {
 		case tar.TypeDir:
