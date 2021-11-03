@@ -35,7 +35,7 @@ const (
 Tar-formers - A golang tool to control tar flows
 `
 
-	TARFORMERS_VERSION = `0.3.2`
+	TARFORMERS_VERSION = `0.3.3`
 )
 
 // Build time and commit information. This code is get from: https://github.com/mudler/luet/
