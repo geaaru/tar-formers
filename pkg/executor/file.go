@@ -201,6 +201,21 @@ func (t *TarFormers) CreateBlockCharFifo(file string, mode os.FileMode, header *
 
 func (t *TarFormers) CreateLink(link specs.Link) error {
 
+	// Existing links could be wrong. Drop the existing link
+	// if there is already the link.
+	exists, err := t.ExistFile(link.Path)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		err = os.Remove(link.Path)
+		if err != nil {
+			t.Logger.Warning(
+				fmt.Sprintf("Error on removing link %s", link.Path))
+		}
+	}
+
 	if link.TypeFlag == tar.TypeSymlink {
 		t.Logger.Debug("Creating symlink ", link.Name, link.Path)
 		if err := syscall.Symlink(link.Linkname, link.Path); err != nil {
