@@ -42,6 +42,21 @@ func (t *TarFormers) CreateFile(dir, name string, mode os.FileMode, reader io.Re
 		return err
 	}
 
+	// To avoid the Text file busy error.
+	// It's needed unlink the file if exists.
+	exists, err := t.ExistFile(file)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		err = os.Remove(file)
+		if err != nil {
+			t.Logger.Warning(
+				fmt.Sprintf("Error on removing file %s", file))
+		}
+	}
+
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode)
 	if err != nil {
 		return errors.New(
