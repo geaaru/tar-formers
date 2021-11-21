@@ -108,7 +108,7 @@ same_chtimes: true
 broken_links_fatal: false
 ```
 
-# Golang API
+## Golang API
 
 Hereinafter, an example about using `tar-formers` API:
 
