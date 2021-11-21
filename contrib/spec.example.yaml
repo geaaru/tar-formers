@@ -8,6 +8,13 @@
 match_prefix:
 #- "/etc/"
 
+# Define the list of regex used to match the paths
+# to ignore. This check is done after the match prefix
+# rules.
+ignore_regexes:
+# - "^/var/pkg"
+
+
 # Define the list of files to ignore.
 ignore_files:
   - "/.dockerenv"

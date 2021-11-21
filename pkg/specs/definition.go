@@ -21,6 +21,7 @@ package specs
 import (
 	"io/fs"
 	"os"
+	"regexp"
 	"time"
 )
 
@@ -32,6 +33,9 @@ type SpecFile struct {
 	// Define the list of files to ignore/skip.
 
 	IgnoreFiles []string `yaml:"ignore_files,omitempty" json:"ignore_files,omitempty"`
+
+	// Define the list of regexes used to match the paths to ignore.
+	IgnoreRegexes []string `yaml:"ignore_regexes,omitempty" json:"ignore_regexes,omitempty"`
 
 	// If the user handler is set. Permit to define the list of the file where
 	// is called the user handler function. If this list is empty it calls
@@ -53,7 +57,8 @@ type SpecFile struct {
 	EnableMutex      bool `yaml:"enable_mutex,omitempty" json:"enable_mutex,omitempty"`
 	OverwritePerms   bool `yaml:"overwrite_perms,omitempty" json:"overwrite_perms,omitempty"`
 
-	mapModifier map[string]bool `yaml:"-" json:"-"`
+	mapModifier   map[string]bool  `yaml:"-" json:"-"`
+	ignoreRegexes []*regexp.Regexp `yaml:"-" json:"-"`
 }
 
 type RenameRule struct {
