@@ -63,6 +63,17 @@ $> tar-formers portal --file test.tar --to ./tmp -d --specs rules.yaml
 # An empty list means accept all.
 match_prefix:
 #- "/etc/"
+# NOTE: for tarball with relative path you need
+# consider to add an additional slash at begin.
+# - "/./pkg/"
+
+# Define the list of regex used to match the paths
+# to ignore. This check is done after the match prefix
+# rules.
+ignore_regexes:
+# - "^/var/pkg"
+#  - "^/./pkg/specs"
+
 
 # Define the list of files to ignore.
 ignore_files:
@@ -84,7 +95,6 @@ rename:
 #  1000: 1001
 
 # Set the same owner present on tarfile. Default true.
-# If set to false the files created with be with the running user/group.
 same_onwer: false
 
 # Set the access and modification time present on tar header. Default false.
@@ -94,4 +104,48 @@ same_chtimes: true
 # Not yet implemented.
 # map_entities: false
 
+# Warning on create hardlink and sym
+broken_links_fatal: false
+```
+
+# Golang API
+
+Hereinafter, an example about using `tar-formers` API:
+
+```go
+
+  // Initialize default tarformers instance
+  // to use the config object used by the library.
+  cfg := tarf_specs.NewConfig(c.Viper)
+  cfg.GetLogging().Level = "warning"
+
+  t := tarf.NewTarFormersWithLog(cfg, true)
+  tarf.SetDefaultTarFormers(t)
+
+  // Untar file
+  in, err := os.Open(srcTarfile)
+  if err != nil {
+    return err
+  }
+  defer in.Close()
+
+    spec := tarf_specs.NewSpecFile()
+    spec.SameOwner = true
+    spec.EnableMutex = true
+    spec.OverwritePerms = true
+    spec.IgnoreFiles = []string{
+      "/dev",
+      "/.dockerenv",
+    }
+
+  tarformers := tarf.NewTarFormers(tarf.GetOptimusPrime().Config)
+  tarformers.SetReader(in)
+
+  if modifier != nil && len(protectedFiles) > 0 {
+    tarformers.SetFileHandler(modifier)
+
+      spec.TriggeredFiles = protectedFiles
+  }
+
+  return tarformers.RunTask(spec, dst)
 ```
