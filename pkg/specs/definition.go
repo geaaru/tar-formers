@@ -41,7 +41,7 @@ type SpecFile struct {
 	// is called the user handler function. If this list is empty it calls
 	// the callback every times (and TriggeredMatchesPrefix)
 	TriggeredFiles         []string `yaml:"triggered_files,omitempty" json:"triggered_files,omitempty"`
-	TriggeredMatchesPrefix []string `yaml:"triggered_matches_prefix,omitempty json:"triggered_matches_prefix,omitempty"`
+	TriggeredMatchesPrefix []string `yaml:"triggered_matches_prefix,omitempty" json:"triggered_matches_prefix,omitempty"`
 
 	Rename []RenameRule `yaml:"rename,omitempty" json:"rename,omitempty"`
 
