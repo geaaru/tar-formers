@@ -129,14 +129,14 @@ Hereinafter, an example about using `tar-formers` API:
   }
   defer in.Close()
 
-    spec := tarf_specs.NewSpecFile()
-    spec.SameOwner = true
-    spec.EnableMutex = true
-    spec.OverwritePerms = true
-    spec.IgnoreFiles = []string{
-      "/dev",
-      "/.dockerenv",
-    }
+  spec := tarf_specs.NewSpecFile()
+  spec.SameOwner = true
+  spec.EnableMutex = true
+  spec.OverwritePerms = true
+  spec.IgnoreFiles = []string{
+    "/dev",
+    "/.dockerenv",
+  }
 
   tarformers := tarf.NewTarFormers(tarf.GetOptimusPrime().Config)
   tarformers.SetReader(in)
