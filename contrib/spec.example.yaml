@@ -7,12 +7,16 @@
 # An empty list means accept all.
 match_prefix:
 #- "/etc/"
+# NOTE: for tarball with relative path you need
+# consider to add an additional slash at begin.
+# - "/./pkg/"
 
 # Define the list of regex used to match the paths
 # to ignore. This check is done after the match prefix
 # rules.
 ignore_regexes:
 # - "^/var/pkg"
+#  - "^/./pkg/specs"
 
 
 # Define the list of files to ignore.
