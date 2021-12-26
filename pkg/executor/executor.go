@@ -53,11 +53,13 @@ type TarFormers struct {
 	Config *specs.Config `yaml:"config" json:"config"`
 	Logger *log.Logger   `yaml:"-" json:"-"`
 
+	writer      io.Writer          `yaml:"-" json:"-"`
 	reader      io.Reader          `yaml:"-" json:"-"`
 	fileHandler TarFileHandlerFunc `yaml:"-" json:"-"`
 
-	Task      *specs.SpecFile `yaml:"task,omitempty" json:"task,omitempty"`
-	ExportDir string          `yaml:"export_dir,omitempty" json:"export_dir,omitempty"`
+	Task       *specs.SpecFile `yaml:"task,omitempty" json:"task,omitempty"`
+	TaskWriter *specs.SpecFile `yaml:"task_writer,omitempty" json:"task_writer,omitempty"`
+	ExportDir  string          `yaml:"export_dir,omitempty" json:"export_dir,omitempty"`
 }
 
 func SetDefaultTarFormers(t *TarFormers) {
@@ -96,6 +98,10 @@ func NewTarFormersWithLog(config *specs.Config, defLog bool) *TarFormers {
 
 func (t *TarFormers) SetReader(reader io.Reader) {
 	t.reader = reader
+}
+
+func (t *TarFormers) SetWriter(writer io.Writer) {
+	t.writer = writer
 }
 
 func (t *TarFormers) HasFileHandler() bool {

@@ -155,6 +155,37 @@ func (t *TarFormers) SetFileProps(path string, meta *specs.FileMeta, link bool) 
 	return nil
 }
 
+func (t *TarFormers) GetXattr(path string) (map[string]string, error) {
+	attr := "security.capability"
+	ans := make(map[string]string, 0)
+
+	// Start with a 128 length byte array
+	dest := make([]byte, 128)
+	sz, errno := unix.Lgetxattr(path, attr, dest)
+
+	for errno == unix.ERANGE {
+		// Buffer too small, use zero-sized buffer to get the actual size
+		sz, errno = unix.Lgetxattr(path, attr, []byte{})
+		if errno != nil {
+			return ans, errno
+		}
+		dest = make([]byte, sz)
+		sz, errno = unix.Lgetxattr(path, attr, dest)
+	}
+
+	switch {
+	case errno == unix.ENODATA:
+		return ans, nil
+	case errno != nil:
+		return ans, errno
+	}
+
+	ans[attr] = string(dest[:sz])
+
+	return ans, nil
+
+}
+
 func (t *TarFormers) SetXattrAttr(path, k, v string, flag int) error {
 	t.Logger.Debug(
 		fmt.Sprintf("[%s] Setting xattr %s with value %s.",

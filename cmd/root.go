@@ -78,6 +78,7 @@ func initCommand(rootCmd *cobra.Command, config *specs.Config) {
 	rootCmd.AddCommand(
 		newDockerExportCommand(config),
 		newPortalCommand(config),
+		newArchiveCommand(config),
 	)
 }
 
