@@ -1,7 +1,10 @@
+GOLANG_VERSION=$(shell go env GOVERSION)
 
 # go tool nm ./luet | grep Commit
 override LDFLAGS += -X "github.com/geaaru/tar-formers/cmd.BuildTime=$(shell date -u '+%Y-%m-%d %I:%M:%S %Z')"
 override LDFLAGS += -X "github.com/geaaru/tar-formers/cmd.BuildCommit=$(shell git rev-parse HEAD)"
+override LDFLAGS += -X "github.com/geaaru/tar-formers/cmd.BuildGoVersion=$(GOLANG_VERSION)"
+
 
 NAME ?= tar-formers
 PACKAGE_NAME ?= $(NAME)
@@ -20,9 +23,9 @@ fmt:
 
 .PHONY: test
 test:
-	GO111MODULE=off go get github.com/onsi/ginkgo/ginkgo
+	GO111MODULE=off go get github.com/onsi/ginkgo/v2/ginkgo
 	GO111MODULE=off go get github.com/onsi/gomega/...
-	ginkgo -race -r -flakeAttempts 3 ./...
+	ginkgo -r -flake-attempts 3 ./...
 
 .PHONY: coverage
 coverage:
@@ -43,8 +46,9 @@ deps:
 	GO111MODULE=off go get golang.org/x/lint/golint
 	GO111MODULE=off go get github.com/mitchellh/gox
 	GO111MODULE=off go get golang.org/x/tools/cmd/cover
-	GO111MODULE=off go get github.com/onsi/ginkgo/ginkgo
+	GO111MODULE=on go get github.com/onsi/ginkgo/v2/ginkgo
 	GO111MODULE=off go get github.com/onsi/gomega/...
+	ginkgo version
 
 .PHONY: build
 build:

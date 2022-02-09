@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021  Daniele Rondina <geaaru@sabayonlinux.org>
+Copyright (C) 2021-2022  Daniele Rondina <geaaru@funtoo.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -38,12 +38,10 @@ Tar-formers - A golang tool to control tar flows
 	TARFORMERS_VERSION = `0.4.0`
 )
 
-// Build time and commit information. This code is get from: https://github.com/mudler/luet/
-//
-// ⚠️ WARNING: should only be set by "-ldflags".
 var (
-	BuildTime   string
-	BuildCommit string
+	BuildTime      string
+	BuildCommit    string
+	BuildGoVersion string
 )
 
 func initConfig(config *specs.Config) {
@@ -63,6 +61,14 @@ func initConfig(config *specs.Config) {
 
 	config.Viper.SetTypeByDefaultValue(true)
 
+}
+
+func version() string {
+	ans := fmt.Sprintf("%s-g%s %s", TARFORMERS_VERSION, BuildCommit, BuildTime)
+	if BuildGoVersion != "" {
+		ans += " " + BuildGoVersion
+	}
+	return ans
 }
 
 func initCommand(rootCmd *cobra.Command, config *specs.Config) {
@@ -90,7 +96,7 @@ func Execute() {
 
 	var rootCmd = &cobra.Command{
 		Short:        cliName,
-		Version:      fmt.Sprintf("%s-g%s %s", TARFORMERS_VERSION, BuildCommit, BuildTime),
+		Version:      version(),
 		Args:         cobra.OnlyValidArgs,
 		SilenceUsage: true,
 		PreRun: func(cmd *cobra.Command, args []string) {
