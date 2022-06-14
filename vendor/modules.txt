@@ -23,9 +23,7 @@ github.com/logrusorgru/aurora
 github.com/magiconair/properties
 # github.com/mitchellh/mapstructure v1.4.3
 github.com/mitchellh/mapstructure
-# github.com/onsi/ginkgo/v2 v2.1.1
-## explicit
-# github.com/onsi/gomega v1.18.1
+# github.com/onsi/ginkgo/v2 v2.1.4
 ## explicit
 # github.com/pelletier/go-toml v1.9.4
 github.com/pelletier/go-toml
@@ -66,7 +64,7 @@ go.uber.org/zap/internal/bufferpool
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
-# golang.org/x/sys v0.0.0-20220128215802-99c3d69c2c27
+# golang.org/x/sys v0.0.0-20220614162138-6c1b26c55098
 ## explicit
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
