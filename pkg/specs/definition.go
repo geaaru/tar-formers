@@ -28,7 +28,7 @@ import (
 type SpecFile struct {
 	File string `yaml:"-" json:"-"`
 
-	// Define the list of prefixes of the path to extract
+	// Define the list of prefixes of the path to extract or to inject
 	MatchPrefix []string `yaml:"match_prefix,omitempty" json:"match_prefix,omitempty"`
 	// Define the list of files to ignore/skip.
 
