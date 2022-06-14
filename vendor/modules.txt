@@ -62,7 +62,7 @@ github.com/subosito/gotenv
 # go.uber.org/atomic v1.9.0
 ## explicit
 go.uber.org/atomic
-# go.uber.org/multierr v1.7.0
+# go.uber.org/multierr v1.8.0
 ## explicit
 go.uber.org/multierr
 # go.uber.org/zap v1.21.0
