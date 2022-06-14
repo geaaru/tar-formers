@@ -1,4 +1,4 @@
-# github.com/fsnotify/fsnotify v1.5.1
+# github.com/fsnotify/fsnotify v1.5.4
 github.com/fsnotify/fsnotify
 # github.com/hashicorp/hcl v1.0.0
 github.com/hashicorp/hcl
@@ -19,19 +19,24 @@ github.com/kyokomi/emoji
 # github.com/logrusorgru/aurora v2.0.3+incompatible
 ## explicit
 github.com/logrusorgru/aurora
-# github.com/magiconair/properties v1.8.5
+# github.com/magiconair/properties v1.8.6
 github.com/magiconair/properties
-# github.com/mitchellh/mapstructure v1.4.3
+# github.com/mitchellh/mapstructure v1.5.0
 github.com/mitchellh/mapstructure
 # github.com/onsi/ginkgo/v2 v2.1.4
 ## explicit
-# github.com/pelletier/go-toml v1.9.4
+# github.com/pelletier/go-toml v1.9.5
 github.com/pelletier/go-toml
-# github.com/spf13/afero v1.8.0
+# github.com/pelletier/go-toml/v2 v2.0.2
 ## explicit
+github.com/pelletier/go-toml/v2
+github.com/pelletier/go-toml/v2/internal/ast
+github.com/pelletier/go-toml/v2/internal/danger
+github.com/pelletier/go-toml/v2/internal/tracker
+# github.com/spf13/afero v1.8.2
 github.com/spf13/afero
 github.com/spf13/afero/mem
-# github.com/spf13/cast v1.4.1
+# github.com/spf13/cast v1.5.0
 github.com/spf13/cast
 # github.com/spf13/cobra v1.3.0
 ## explicit
@@ -40,15 +45,19 @@ github.com/spf13/cobra
 github.com/spf13/jwalterweatherman
 # github.com/spf13/pflag v1.0.5
 github.com/spf13/pflag
-# github.com/spf13/viper v1.10.1
+# github.com/spf13/viper v1.12.0
 ## explicit
 github.com/spf13/viper
 github.com/spf13/viper/internal/encoding
+github.com/spf13/viper/internal/encoding/dotenv
 github.com/spf13/viper/internal/encoding/hcl
+github.com/spf13/viper/internal/encoding/ini
+github.com/spf13/viper/internal/encoding/javaproperties
 github.com/spf13/viper/internal/encoding/json
 github.com/spf13/viper/internal/encoding/toml
 github.com/spf13/viper/internal/encoding/yaml
-# github.com/subosito/gotenv v1.2.0
+# github.com/subosito/gotenv v1.4.0
+## explicit
 github.com/subosito/gotenv
 # go.uber.org/atomic v1.9.0
 ## explicit
@@ -71,9 +80,11 @@ golang.org/x/sys/unix
 # golang.org/x/text v0.3.7
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
-# gopkg.in/ini.v1 v1.66.3
+# gopkg.in/ini.v1 v1.66.6
 ## explicit
 gopkg.in/ini.v1
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.1
+gopkg.in/yaml.v3
