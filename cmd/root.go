@@ -23,6 +23,7 @@ import (
 	"os"
 	"strings"
 
+	log "github.com/geaaru/tar-formers/pkg/logger"
 	specs "github.com/geaaru/tar-formers/pkg/specs"
 
 	"github.com/spf13/cobra"
@@ -121,6 +122,9 @@ func Execute() {
 			if err != nil {
 				panic(err)
 			}
+
+			logger := log.NewLogger(config)
+			logger.SetAsDefault()
 		},
 	}
 
