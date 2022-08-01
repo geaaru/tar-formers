@@ -31,7 +31,7 @@ import (
 )
 
 const (
-	cliName = `Copyright (c) 2021 - Daniele Rondina
+	cliName = `Copyright (c) 2021-2022 - Daniele Rondina
 
 Tar-formers - A golang tool to control tar flows
 `
