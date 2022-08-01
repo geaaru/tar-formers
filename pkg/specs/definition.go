@@ -59,6 +59,10 @@ type SpecFile struct {
 
 	mapModifier   map[string]bool  `yaml:"-" json:"-"`
 	ignoreRegexes []*regexp.Regexp `yaml:"-" json:"-"`
+
+	// Parallel max open files.
+	MaxOpenFiles int64 `yaml:"max_openfiles,omitempty" json:"max_openfiles,omitempty"`
+	BufferSize   int   `yaml:"copy_buffer_size,omitempty" json:"copy_buffer_size,omitempty"`
 }
 
 type RenameRule struct {
