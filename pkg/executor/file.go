@@ -109,12 +109,12 @@ func (t *TarFormers) CreateFile(dir, name string, mode os.FileMode, reader io.Re
 				exists, err := t.ExistFile(file)
 				if err != nil {
 					t.FlushErrs = append(t.FlushErrs,
-						fmt.Sprintf("For file %s validation failed: %s",
-							file, err.Error()))
+						errors.New(fmt.Sprintf("For file %s validation failed: %s",
+							file, err.Error())))
 				} else if !exists {
 					t.FlushErrs = append(t.FlushErrs,
-						fmt.Sprintf("For file %s validation failed: file not found.",
-							file))
+						errors.New(fmt.Sprintf("For file %s validation failed: file not found.",
+							file)))
 				}
 
 			}
