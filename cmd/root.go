@@ -1,5 +1,4 @@
 /*
-
 Copyright (C) 2021-2022  Daniele Rondina <geaaru@funtoo.org>
 
 This program is free software: you can redistribute it and/or modify
@@ -14,7 +13,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
-
 */
 package cmd
 
@@ -31,11 +29,11 @@ import (
 )
 
 const (
-	cliName = `Copyright (c) 2021-2022 - Daniele Rondina
+	cliName = `Copyright (c) 2021-2023 - Daniele Rondina
 
 Tar-formers - A golang tool to control tar flows
 `
-	TARFORMERS_VERSION = `0.6.0`
+	TARFORMERS_VERSION = `0.6.1`
 )
 
 var (
