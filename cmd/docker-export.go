@@ -95,7 +95,7 @@ func newDockerExportCommand(config *specs.Config) *cobra.Command {
 	var cmd = &cobra.Command{
 		Use:     "docker-export [container-id]",
 		Short:   "Export a docker container files to a specified directory.",
-		Aliases: []string{"h"},
+		Aliases: []string{"de"},
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
 				fmt.Println("No container id present.")
