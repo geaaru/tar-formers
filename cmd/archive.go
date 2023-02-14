@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021  Daniele Rondina <geaaru@sabayonlinux.org>
+Copyright (C) 2021-2023  Daniele Rondina <geaaru@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,23 +20,24 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
-	"archive/tar"
 	"fmt"
 	"os"
 
 	executor "github.com/geaaru/tar-formers/pkg/executor"
 	specs "github.com/geaaru/tar-formers/pkg/specs"
+	"github.com/geaaru/tar-formers/pkg/tools"
 
 	"github.com/spf13/cobra"
 )
 
 func newArchiveCommand(config *specs.Config) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     "archive <tarball> <dir1> ... <dirN> [OPTIONS]",
+		Use:     "archive <tarball> [<dir1> ... <dirN>] [OPTIONS]",
 		Short:   "Archive one or more directories to a tarball.",
-		Aliases: []string{"h"},
+		Aliases: []string{"a"},
 		PreRun: func(cmd *cobra.Command, args []string) {
-			if len(args) < 2 {
+			spec, _ := cmd.Flags().GetString("specs")
+			if len(args) < 1 || (len(args) < 2 && spec == "") {
 				fmt.Println("Missing mandatory arguments")
 				os.Exit(1)
 			}
@@ -46,12 +47,12 @@ func newArchiveCommand(config *specs.Config) *cobra.Command {
 			var err error
 
 			spec, _ := cmd.Flags().GetString("specs")
+			compression, _ := cmd.Flags().GetString("compression")
 
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
 
 			archiveFile := args[0]
-			dirs := args[1:]
 			if spec != "" {
 				s, err = specs.NewSpecFileFromFile(spec)
 				if err != nil {
@@ -63,30 +64,36 @@ func newArchiveCommand(config *specs.Config) *cobra.Command {
 			} else {
 				s = specs.NewSpecFile()
 				s.SameChtimes = true
+				s.Writer = specs.NewWriter()
+				s.Writer.ArchiveDirs = args[1:]
 			}
 
-			tarformers.TaskWriter = s
+			opts := tools.NewTarCompressionOpts(compression == "")
+			if compression != "" {
+				opts.Mode = tools.ParseCompressionMode(compression)
+			}
+			defer opts.Close()
 
-			// Create the tarball
-			out, err := os.Create(archiveFile)
+			err = tools.PrepareTarWriter(archiveFile, opts)
 			if err != nil {
 				fmt.Println(fmt.Sprintf(
-					"Error on create file %s: %s", archiveFile, err.Error()))
+					"Error on prepare writer: %s",
+					err.Error()))
 				os.Exit(1)
 			}
-			defer out.Close()
 
-			tw := tar.NewWriter(out)
-			defer tw.Close()
+			if opts.CompressWriter != nil {
+				tarformers.SetWriter(opts.CompressWriter)
+			} else {
+				tarformers.SetWriter(opts.FileWriter)
+			}
 
-			for _, d := range dirs {
-				err := tarformers.InjectDir2Writer(tw, d)
-				if err != nil {
-					fmt.Println(
-						fmt.Sprintf("Error on inject directory %s: %s",
-							d, err.Error()))
-					os.Exit(1)
-				}
+			err = tarformers.RunTaskWriter(s)
+			if err != nil {
+				fmt.Println(fmt.Sprintf(
+					"Error on create tarball %s: %s",
+					archiveFile, err.Error()))
+				os.Exit(1)
 			}
 
 			fmt.Println("Operation completed.")
@@ -94,6 +101,9 @@ func newArchiveCommand(config *specs.Config) *cobra.Command {
 	}
 
 	flags := cmd.Flags()
+	flags.String("compression", "",
+		"Specify tarball compression and ignoring extention of the file."+
+			" Possible values: gz|gzip|zstd|xz|bz2|bzip2|none.")
 	flags.String("specs", "", "Define a spec file with the rules to follow.")
 
 	return cmd
