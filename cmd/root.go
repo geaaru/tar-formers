@@ -33,7 +33,7 @@ const (
 
 Tar-formers - A golang tool to control tar flows
 `
-	TARFORMERS_VERSION = `0.6.1`
+	TARFORMERS_VERSION = `0.7.0`
 )
 
 var (
