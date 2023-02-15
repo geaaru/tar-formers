@@ -32,8 +32,27 @@ import (
 
 func newArchiveCommand(config *specs.Config) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     "archive <tarball> [<dir1> ... <dirN>] [OPTIONS]",
-		Short:   "Archive one or more directories to a tarball.",
+		Use:   "archive <tarball|-> [<dir1> ... <dirN>] [OPTIONS]",
+		Short: "Archive one or more directories to a tarball.",
+		Long: `Archive one or more directly without changes on tarball file file.tar.gz
+
+$> tar-formers archive /tmp/file.tar.gz /mydir1 /mydir2
+
+Archive directories defined on the spec file to file file.tar.xz
+
+$> tar-formers archive /tmp/file.tar.xz --specs specs.yaml
+
+Archive directories defined on the spec file with eventually filters
+to stdout as tar stream:
+
+$> tar-formers archive - --specs specs.yaml | tar -C /target -xvf
+
+Archive directories and filters file to stdout as compressed stream:
+
+$> tar-formers archive - --specs specs.yaml --compression zstd > /tmp/file.tar.zstd
+
+NOTE: Bzip2 compression is experimental.
+`,
 		Aliases: []string{"a"},
 		PreRun: func(cmd *cobra.Command, args []string) {
 			spec, _ := cmd.Flags().GetString("specs")
@@ -96,7 +115,9 @@ func newArchiveCommand(config *specs.Config) *cobra.Command {
 				os.Exit(1)
 			}
 
-			fmt.Println("Operation completed.")
+			if archiveFile != "-" {
+				fmt.Println("Operation completed.")
+			}
 		},
 	}
 

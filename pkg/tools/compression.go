@@ -17,6 +17,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package tools
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -82,28 +83,51 @@ func (o *TarCompressionOpts) Close() {
 	}
 }
 
+type NopCloseWriter struct {
+	*bufio.Writer
+}
+
+func NewNopCloseWriter(buf *bufio.Writer) *NopCloseWriter {
+	return &NopCloseWriter{Writer: buf}
+}
+
+func (ncw *NopCloseWriter) Close() error {
+	ncw.Flush()
+	return nil
+}
+
 func PrepareTarWriter(file string, opts *TarCompressionOpts) error {
 	var err error
-
-	opts.FileWriter, err = os.Create(file)
-	if err != nil {
-		return fmt.Errorf(
-			"Error on create file %s: %s", file, err.Error())
-	}
-
 	cMode := None
-	if opts.UseExt {
-		if strings.HasSuffix(file, ".gz") || strings.HasSuffix(file, ".gzip") {
-			cMode = Gzip
-		} else if strings.HasSuffix(file, ".zstd") {
-			cMode = Zstd
-		} else if strings.HasSuffix(file, ".xz") {
-			cMode = Xz
-		} else if strings.HasSuffix(file, ".bz2") || strings.HasSuffix(file, ".bzip2") {
-			cMode = Bzip2
+
+	if file == "-" {
+		// POST: Using stdout for write
+		w := bufio.NewWriter(os.Stdout)
+		opts.FileWriter = NewNopCloseWriter(w)
+
+		if !opts.UseExt {
+			cMode = opts.Mode
 		}
 	} else {
-		cMode = opts.Mode
+		opts.FileWriter, err = os.Create(file)
+		if err != nil {
+			return fmt.Errorf(
+				"Error on create file %s: %s", file, err.Error())
+		}
+
+		if opts.UseExt {
+			if strings.HasSuffix(file, ".gz") || strings.HasSuffix(file, ".gzip") {
+				cMode = Gzip
+			} else if strings.HasSuffix(file, ".zstd") {
+				cMode = Zstd
+			} else if strings.HasSuffix(file, ".xz") {
+				cMode = Xz
+			} else if strings.HasSuffix(file, ".bz2") || strings.HasSuffix(file, ".bzip2") {
+				cMode = Bzip2
+			}
+		} else {
+			cMode = opts.Mode
+		}
 	}
 
 	switch cMode {
