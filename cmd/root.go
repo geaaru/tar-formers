@@ -80,6 +80,7 @@ func initCommand(rootCmd *cobra.Command, config *specs.Config) {
 	config.Viper.BindPFlag("general.debug", pflags.Lookup("debug"))
 
 	rootCmd.AddCommand(
+		newBridgeCommand(config),
 		newDockerExportCommand(config),
 		newPortalCommand(config),
 		newArchiveCommand(config),
