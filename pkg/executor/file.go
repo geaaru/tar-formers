@@ -71,14 +71,14 @@ func (t *TarFormers) CreateFile(dir, name string, mode os.FileMode, reader io.Re
 	nb, err := io.CopyBuffer(f, reader, copyBuffer)
 	if err != nil {
 		f.Close()
-		return errors.New(
-			fmt.Sprintf("Error on write file %s: %s", file, err.Error()))
+		return fmt.Errorf("Error on write file %s: %s",
+			file, err.Error())
 	}
 	if nb != header.Size {
 		f.Close()
-		return errors.New(
-			fmt.Sprintf("For file %s written file are different %d - %d",
-				file, nb, header.Size))
+		return fmt.Errorf(
+			"For file %s written file are different %d - %d",
+			file, nb, header.Size)
 	}
 
 	if t.Config.GetLogging().Level == "debug" {
