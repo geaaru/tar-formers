@@ -1,8 +1,14 @@
 # tar-formers
-A library and tool to modify tar flows at runtime
+A library and tool to modify tar flows at runtime.
+
+The tool `tar-formers` was born to be a helpful tool for testing the
+library tar-formers that is mainly used by the [luet](https://github.com/geaaru/luet) the
+[Macaroni OS](https://github.com/macaroni-os/) PMS.
+But could be used as static binary for archiving the directories, and files in different
+compressions as an alternative to `tar` binary and apply renames, and filters at runtime.
 
 ```bash
-tar-formers --help
+$> tar-formers --help
 Copyright (c) 2021-2023 - Daniele Rondina
 
 Tar-formers - A golang tool to control tar flows
