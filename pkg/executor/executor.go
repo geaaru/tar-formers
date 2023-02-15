@@ -68,7 +68,7 @@ type TarFormers struct {
 	Task       *specs.SpecFile `yaml:"task,omitempty" json:"task,omitempty"`
 	TaskWriter *specs.SpecFile `yaml:"task_writer,omitempty" json:"task_writer,omitempty"`
 
-	// Using wait group to run f.Sync in parallel
+	//Using wait group to run f.Sync in parallel
 	// Run f.Sync kills time processing.
 	waitGroup *sync.WaitGroup
 	Ctx       *context.Context
@@ -166,6 +166,154 @@ func (t *TarFormers) RunTaskWriter(task *specs.SpecFile) error {
 	}
 
 	return nil
+}
+
+func (t *TarFormers) RunTaskBridge(in, out *specs.SpecFile) error {
+	if in == nil || out == nil || out.Writer == nil {
+		return errors.New("Invalid tasks")
+	}
+
+	t.TaskWriter = out
+	t.Task = in
+
+	t.Task.Prepare()
+	t.TaskWriter.Prepare()
+
+	tarWriter := tar.NewWriter(t.writer)
+	defer tarWriter.Close()
+
+	tarReader := tar.NewReader(t.reader)
+
+	err := t.HandlerTarBridgeFlow(tarReader, tarWriter)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (t *TarFormers) HandlerTarBridgeFlow(
+	tarReader *tar.Reader, tarWriter *tar.Writer) error {
+	var ans error = nil
+
+	for {
+		header, err := tarReader.Next()
+
+		if err == io.EOF {
+			err = nil
+			break
+		}
+
+		if err != nil {
+			ans = err
+			break
+		}
+
+		name := header.Name
+
+		// Call file handler also for file that could be skipped and permit
+		// to notify this to users.
+		if t.HasFileHandler() && t.Task.IsFileTriggered(name) {
+			opts := TarFileOperation{
+				Rename:  false,
+				NewName: "",
+				Skip:    false,
+			}
+
+			err := t.fileHandler(name, "", header, tarReader, &opts, t)
+			if err != nil {
+				return err
+			}
+
+			if opts.Skip {
+				t.Logger.Debug(fmt.Sprintf(
+					"File %s skipped from reader callback.", header.Name))
+				continue
+			}
+
+			if opts.Rename {
+				name = opts.NewName
+				t.Logger.Debug(fmt.Sprintf(
+					"File %s renamed in %s from reader callback.",
+					header.Name, name))
+			}
+		}
+
+		if t.Task.IsPath2Skip(name) {
+			t.Logger.Debug(fmt.Sprintf("File %s skipped by reader.", name))
+			continue
+		}
+
+		fnewname := t.TaskWriter.GetRename(name)
+
+		// Call file handler also for file that could be skipped
+		// and permit to notify this to users
+		if t.HasFileWriterHandler() && t.TaskWriter.IsFileTriggered(name) {
+			opts := TarFileOperation{
+				Rename:  false,
+				NewName: "",
+				Skip:    false,
+			}
+
+			err := t.fileWriterHandler(name, fnewname, header, tarWriter, &opts, t)
+			if err != nil {
+				return fmt.Errorf(
+					"Error returned from user handler for file %s: %s",
+					name, err.Error())
+			}
+
+			if opts.Skip {
+				t.Logger.Debug(fmt.Sprintf(
+					"File %s skipped from writer callback.", name))
+				return nil
+			}
+
+			if opts.Rename {
+				name = opts.NewName
+			} else {
+				name = fnewname
+			}
+		} else if name != fnewname {
+			name = fnewname
+		}
+
+		if t.TaskWriter.IsPath2Skip(name) {
+			t.Logger.Debug(fmt.Sprintf("File %s skipped by writer.", name))
+			continue
+		}
+
+		t.Logger.Debug(fmt.Sprintf("Processing file %s -> %s of type %d",
+			header.Name, name, header.Typeflag))
+
+		header.Name = name
+
+		// Write tar header
+		err = tarWriter.WriteHeader(header)
+		if err != nil {
+			return fmt.Errorf(
+				"Error on write header for file '%s': %s'",
+				name, err.Error())
+		}
+
+		switch header.Typeflag {
+		case tar.TypeReg, tar.TypeRegA:
+			nb, err := io.Copy(tarWriter, tarReader)
+			if err != nil {
+				return fmt.Errorf(
+					"Error on write file %s: %s", name, err.Error())
+			}
+			if nb != header.Size {
+				return fmt.Errorf(
+					"For file %s written %s instead of %s bytes.",
+					nb, header.Size)
+			}
+		}
+
+	}
+
+	tarWriter.Flush()
+
+	return ans
 }
 
 func (t *TarFormers) HandleTarFlowWriter(tarWriter *tar.Writer) error {
