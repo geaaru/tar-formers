@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2021  Daniele Rondina <geaaru@sabayonlinux.org>
+Copyright (C) 2021-2023 Daniele Rondina <geaaru@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -26,12 +26,15 @@ import (
 
 	executor "github.com/geaaru/tar-formers/pkg/executor"
 	specs "github.com/geaaru/tar-formers/pkg/specs"
+	"github.com/geaaru/tar-formers/pkg/tools"
 
 	"github.com/spf13/cobra"
 )
 
-func exporDockerContainer(tarformers *executor.TarFormers, cid, dir, spec string) {
+func exporDockerContainer(tarformers *executor.TarFormers,
+	cid, dir, file, spec, specOut string) error {
 	var s *specs.SpecFile = nil
+	var sWriter *specs.SpecFile = nil
 	var err error
 
 	cmds := []string{
@@ -42,14 +45,26 @@ func exporDockerContainer(tarformers *executor.TarFormers, cid, dir, spec string
 	if spec != "" {
 		s, err = specs.NewSpecFileFromFile(spec)
 		if err != nil {
-			fmt.Println(fmt.Sprintf(
+			return fmt.Errorf(
 				"Error on read file %s: %s",
-				spec, err.Error()))
-			os.Exit(1)
+				spec, err.Error())
 		}
 	} else {
 		s = specs.NewSpecFile()
-		s.IgnoreFiles = append(s.IgnoreFiles, "/.dockerenv")
+		s.IgnoreFiles = append(s.IgnoreFiles, ".dockerenv")
+	}
+
+	if specOut != "" {
+		sWriter, err = specs.NewSpecFileFromFile(specOut)
+		if err != nil {
+			return fmt.Errorf(
+				"Error on read file %s: %s",
+				specOut, err.Error())
+		}
+	} else {
+		sWriter = specs.NewSpecFile()
+		sWriter.SameChtimes = true
+		sWriter.Writer = specs.NewWriter()
 	}
 
 	hostCommand := exec.Command(cmds[0], cmds[1:]...)
@@ -57,44 +72,79 @@ func exporDockerContainer(tarformers *executor.TarFormers, cid, dir, spec string
 
 	outReader, err := hostCommand.StdoutPipe()
 	if err != nil {
-		fmt.Println("Error on get stdout pipe :" + err.Error())
-		os.Exit(1)
+		return fmt.Errorf("Error on get stdout pipe :" + err.Error())
 	}
 
 	tarformers.SetReader(outReader)
 
 	err = hostCommand.Start()
 	if err != nil {
-		fmt.Println("Error on start " + err.Error())
-		os.Exit(1)
+		return fmt.Errorf("Error on start " + err.Error())
 	}
 
-	err = tarformers.RunTask(s, dir)
-	if err != nil {
-		fmt.Println("Error on process tarball :" + err.Error())
-		os.Exit(1)
+	if dir != "" {
+		err = tarformers.RunTask(s, dir)
+		if err != nil {
+			return fmt.Errorf("Error on process tarball :" + err.Error())
+		}
+	} else {
+		// Prepare the writer
+		opts := tools.NewTarCompressionOpts(true)
+		defer opts.Close()
+
+		err = tools.PrepareTarWriter(file, opts)
+		if err != nil {
+			return fmt.Errorf("Error on prepare writer: %s",
+				err.Error())
+		}
+
+		if opts.CompressWriter != nil {
+			tarformers.SetWriter(opts.CompressWriter)
+		} else {
+			tarformers.SetWriter(opts.FileWriter)
+		}
+
+		err = tarformers.RunTaskBridge(s, sWriter)
+		if err != nil {
+			return fmt.Errorf("Error on process tarball :" + err.Error())
+		}
+
 	}
 
 	err = hostCommand.Wait()
 	if err != nil {
-		fmt.Println("Error on wait " + err.Error())
-		os.Exit(1)
+		return fmt.Errorf("Error on wait " + err.Error())
 	}
 
 	res := hostCommand.ProcessState.ExitCode()
 	if res != 0 {
 		fmt.Println("Exporting exit with ", res)
-	} else {
+	} else if file != "-" {
 		fmt.Println("Operation completed.")
 	}
 
-	os.Exit(0)
+	return nil
 }
 
 func newDockerExportCommand(config *specs.Config) *cobra.Command {
 	var cmd = &cobra.Command{
-		Use:     "docker-export [container-id]",
-		Short:   "Export a docker container files to a specified directory.",
+		Use:   "docker-export [container-id]",
+		Short: "Export the files a docker container to a specified directory or to a file.",
+		Long: `Export docker container files to a specified directory:
+
+$> tar-formers docker-export <container-id> --todir ./out
+
+Export docker container files, apply filter and generate a new tarball.
+
+$> tar-formers docker-export <container-id> --to /mycontainer.tar.gz --specs spec.yml
+
+Export docker container files, apply filter on both reader and writer
+and generate a new tarball.
+
+$> tar-formers docker-export <container-id> --to /mycontainer.tar.gz --specs spec.yml \
+   --out specs-writer.yml
+
+`,
 		Aliases: []string{"de"},
 		PreRun: func(cmd *cobra.Command, args []string) {
 			if len(args) == 0 {
@@ -102,28 +152,43 @@ func newDockerExportCommand(config *specs.Config) *cobra.Command {
 				os.Exit(1)
 			}
 
+			todir, _ := cmd.Flags().GetString("todir")
 			to, _ := cmd.Flags().GetString("to")
-			if to == "" {
-				fmt.Println("No export directory defined.")
+			if todir == "" && to == "" {
+				fmt.Println(
+					"No export directory or target file defined.",
+				)
 				os.Exit(1)
 			}
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 
 			to, _ := cmd.Flags().GetString("to")
+			todir, _ := cmd.Flags().GetString("todir")
 			specfile, _ := cmd.Flags().GetString("specs")
+			out, _ := cmd.Flags().GetString("out")
 
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
 
-			exporDockerContainer(tarformers, args[0], to, specfile)
+			err := exporDockerContainer(
+				tarformers, args[0], todir,
+				to, specfile, out)
+
+			if err != nil {
+				fmt.Println(err.Error())
+				os.Exit(1)
+			}
 
 		},
 	}
 
 	flags := cmd.Flags()
-	flags.String("to", "", "Export directory where untar files.")
+	flags.String("todir", "", "Export directory where untar files.")
+	flags.String("to", "", "Target tarball file or stream with the container files.")
 	flags.String("specs", "", "Define a spec file with the rules to follow.")
+	flags.String("out", "",
+		"Define a spec file with the rules to follow for the writer. Only used with --to.")
 
 	return cmd
 }
