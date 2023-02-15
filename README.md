@@ -2,8 +2,8 @@
 A library and tool to modify tar flows at runtime
 
 ```bash
-$> tar-formers --help
-Copyright (c) 2021 - Daniele Rondina
+tar-formers --help
+Copyright (c) 2021-2023 - Daniele Rondina
 
 Tar-formers - A golang tool to control tar flows
 
@@ -11,8 +11,11 @@ Usage:
    [command]
 
 Available Commands:
-  completion    generate the autocompletion script for the specified shell
-  docker-export Export a docker container files to a specified directory.
+  archive       Archive one or more directories to a tarball.
+  bridge        Extract a stdin flow or an input tarball and bridge it to tar output stream or file.
+  completion    Generate the autocompletion script for the specified shell
+  docker-export Export the files a docker container to a specified directory or to a file.
+  docker-import Create a docker image from a directory or a tarball.
   help          Help about any command
   portal        Extract a stdin flow or a tar file to a specified directory.
 
@@ -25,10 +28,10 @@ Flags:
 Use " [command] --help" for more information about a command.
 ```
 
-## Export docker container and apply filter
+## Export docker container to a directory and apply filter
 
 ```bash
-$> tar-formers docker-export <container-id> --to ./tmp
+$> tar-formers docker-export <container-id> --todir ./tmp
 ```
 
 ***
@@ -36,6 +39,34 @@ The `docker export` command at the moment doesn't set the
 Uname and Gname attribute of the tarball flow so, you
 can't use it with map_entities feature.
 ***
+
+## Export docker container to a tarball and apply filter
+
+The type of the compression is automatically detected by the
+extension of the filename.
+
+```bash
+$> tar-formers docker-export <container-id> --to /mycontaincer.tar.gz --specs specs.yml
+```
+
+The option `--to` accepts the `-` for write flow to stdout.
+
+
+## Create a docker image from with the content of a directory filtered
+
+```bash
+$> tar-formers docker-import geaaru/tar-formers:latest --dir ./tmp --platform amd64 \
+    -m "My image" --change 'ENTRYPOINT ["/bin/sh"]' --specs specs.yml
+```
+
+## Create a docker image from a tarball filtered
+
+```bash
+$> tar-formers di geaaru/tar-formers:latest --file container.tar --platform amd64 \
+    -m "My image" --change 'ENTRYPOINT ["/bin/sh"]' --specs specs.yml
+```
+
+NOTE: At the moment `--file` accepts only tarball (.tar) files.
 
 ## Extract tar flow related to a specific rules from stdin
 
