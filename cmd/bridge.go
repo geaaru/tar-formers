@@ -100,7 +100,7 @@ $> tar-formers bridge --stdin --file /input.tar --to /tmp/file.tar.xz --out spec
 				}
 			} else {
 				sReader = specs.NewSpecFile()
-				sReader.IgnoreFiles = append(sReader.IgnoreFiles, "/.dockerenv")
+				sReader.IgnoreFiles = append(sReader.IgnoreFiles, ".dockerenv")
 			}
 
 			// Parse output spec file
@@ -130,6 +130,7 @@ $> tar-formers bridge --stdin --file /input.tar --to /tmp/file.tar.xz --out spec
 				fmt.Println(fmt.Sprintf(
 					"Error on prepare writer: %s",
 					err.Error()))
+				opts.Close()
 				os.Exit(1)
 			}
 
