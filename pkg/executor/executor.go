@@ -169,8 +169,12 @@ func (t *TarFormers) RunTaskWriter(task *specs.SpecFile) error {
 }
 
 func (t *TarFormers) RunTaskBridge(in, out *specs.SpecFile) error {
-	if in == nil || out == nil || out.Writer == nil {
-		return errors.New("Invalid tasks")
+	if in == nil {
+		return errors.New("Invalid input task")
+	}
+
+	if out == nil || out.Writer == nil {
+		return errors.New("Invalid out task")
 	}
 
 	t.TaskWriter = out
@@ -329,6 +333,7 @@ func (t *TarFormers) HandleTarFlowWriter(tarWriter *tar.Writer) error {
 					err.Error())
 			}
 		}
+
 	}
 
 	// Write all files selected
