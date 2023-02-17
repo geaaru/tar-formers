@@ -74,13 +74,6 @@ func NewSpecFileFromFile(file string) (*SpecFile, error) {
 	return NewSpecFileFromYaml(data, file)
 }
 
-func NewWriter() *WriterRules {
-	return &WriterRules{
-		ArchiveDirs:  []string{},
-		ArchiveFiles: []string{},
-	}
-}
-
 func (s *SpecFile) OverwritePerms2Dir() bool {
 	return s.OverwritePerms
 }
@@ -196,4 +189,19 @@ func NewFileMeta(header *tar.Header) FileMeta {
 
 func (m *FileMeta) GetFileMode() fs.FileMode {
 	return m.FileInfo.Mode()
+}
+
+func NewWriter() *WriterRules {
+	return &WriterRules{
+		ArchiveDirs:  []string{},
+		ArchiveFiles: []string{},
+	}
+}
+
+func (w *WriterRules) AddDir(dir string) {
+	w.ArchiveDirs = append(w.ArchiveDirs, dir)
+}
+
+func (w *WriterRules) AddFile(f string) {
+	w.ArchiveFiles = append(w.ArchiveFiles, f)
 }
