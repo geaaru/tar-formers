@@ -134,8 +134,8 @@ func (t *TarFormers) InjectFile2Writer(tw *tar.Writer,
 	header.Uid = int(stat_t.Uid)
 	header.Gid = int(stat_t.Gid)
 
-	t.Logger.Debug(fmt.Sprintf("Processing file %s of type %d",
-		file, header.Typeflag))
+	t.Logger.Debug(fmt.Sprintf("Processing file %s -> %s of type %d",
+		file, header.Name, header.Typeflag))
 
 	err = tw.WriteHeader(header)
 	if err != nil {
