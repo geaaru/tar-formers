@@ -1,6 +1,7 @@
 # tar-formers
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/geaaru/tar-formers)](https://goreportcard.com/report/github.com/geaaru/tar-formers)
+[![Build on push](https://github.com/geaaru/tar-formers/actions/workflows/push.yml/badge.svg)](https://github.com/geaaru/tar-formers/actions/workflows/push.yml)
 
 A library and tool to modify tar flows at runtime.
 
