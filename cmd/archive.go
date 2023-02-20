@@ -112,6 +112,7 @@ NOTE: Bzip2 compression is experimental.
 				fmt.Println(fmt.Sprintf(
 					"Error on create tarball %s: %s",
 					archiveFile, err.Error()))
+				opts.Close()
 				os.Exit(1)
 			}
 

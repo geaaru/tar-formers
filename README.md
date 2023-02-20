@@ -72,7 +72,7 @@ $> tar-formers di geaaru/tar-formers:latest --file container.tar --platform amd6
     -m "My image" --change 'ENTRYPOINT ["/bin/sh"]' --specs specs.yml
 ```
 
-NOTE: At the moment `--file` accepts only tarball (.tar) files.
+NOTE: The supported files for the option `--file` are: gzip|gz,zstd,xz,bzip2|bz2,tar
 
 ## Extract tar flow related to a specific rules from stdin
 
@@ -80,10 +80,10 @@ NOTE: At the moment `--file` accepts only tarball (.tar) files.
 $> tar -cpf - ./pkg | tar-formers portal --stdin --specs rules.yaml --to ./tmp
 ```
 
-## Extract tar flow related to a specific rules from file
+## Extract tar flow related to a specific rules from tar file compressed in gzip
 
 ```bash
-$> tar-formers portal --file test.tar --to ./tmp -d --specs rules.yaml
+$> tar-formers portal --file test.tar.gz --to ./tmp -d --specs rules.yaml
 ```
 
 ### Rules YAML file

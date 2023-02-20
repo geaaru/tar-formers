@@ -20,13 +20,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 package cmd
 
 import (
-	"bufio"
 	"fmt"
-	"io"
 	"os"
 
 	executor "github.com/geaaru/tar-formers/pkg/executor"
 	specs "github.com/geaaru/tar-formers/pkg/specs"
+	"github.com/geaaru/tar-formers/pkg/tools"
 
 	"github.com/spf13/cobra"
 )
@@ -63,6 +62,7 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 			spec, _ := cmd.Flags().GetString("specs")
 			stdin, _ := cmd.Flags().GetBool("stdin")
 			file, _ := cmd.Flags().GetString("file")
+			compression, _ := cmd.Flags().GetString("compression")
 
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
@@ -80,24 +80,28 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 				s.IgnoreFiles = append(s.IgnoreFiles, "/.dockerenv")
 			}
 
-			var reader io.Reader
-
-			if stdin {
-				reader = bufio.NewReader(os.Stdin)
-			} else {
-				f, err := os.OpenFile(file, os.O_RDONLY, 0666)
-				if err != nil {
-					fmt.Println(fmt.Sprintf("Error on open file %s: %s",
-						file, err.Error()))
-					os.Exit(1)
-				}
-				defer f.Close()
-				reader = f
+			opts := tools.NewTarReaderCompressionOpts(compression == "")
+			if compression != "" {
+				opts.Mode = tools.ParseCompressionMode(compression)
 			}
 
-			tarformers.SetReader(reader)
+			if stdin {
+				file = "-"
+			}
+			err = tools.PrepareTarReader(file, opts)
+			if err != nil {
+				fmt.Println("Error on prepare reader:", err.Error())
+				os.Exit(1)
+			}
+
+			if opts.CompressReader != nil {
+				tarformers.SetReader(opts.CompressReader)
+			} else {
+				tarformers.SetReader(opts.FileReader)
+			}
 
 			err = tarformers.RunTask(s, to)
+			opts.Close()
 			if err != nil {
 				fmt.Println("Error on process tarball :" + err.Error())
 				os.Exit(1)
@@ -112,6 +116,9 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 	flags.String("specs", "", "Define a spec file with the rules to follow.")
 	flags.Bool("stdin", false, "Read tar flow from stdin.")
 	flags.String("file", "", "Read tar flow from specified file.")
+	flags.String("compression", "",
+		"Specify tarball compression and ignoring extention of the file."+
+			" Possible values: gz|gzip|zstd|xz|bz2|bzip2|none.")
 
 	return cmd
 }
