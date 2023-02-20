@@ -1,4 +1,7 @@
 # tar-formers
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/geaaru/tar-formers)](https://goreportcard.com/report/github.com/geaaru/tar-formers)
+
 A library and tool to modify tar flows at runtime.
 
 The tool `tar-formers` was born to be a helpful tool for testing the
