@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/dsnet/compress v0.0.1
-	github.com/klauspost/compress v1.15.15
-	github.com/klauspost/pgzip v1.2.5
+	github.com/klauspost/compress v1.16.5
+	github.com/klauspost/pgzip v1.2.6
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spf13/cobra v1.7.0
