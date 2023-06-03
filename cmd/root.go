@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2021-2022  Daniele Rondina <geaaru@funtoo.org>
+Copyright (C) 2021-2023  Daniele Rondina <geaaru@funtoo.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ const (
 
 Tar-formers - A golang tool to control tar flows
 `
-	TARFORMERS_VERSION = `0.8.1`
+	TARFORMERS_VERSION = `0.8.2`
 )
 
 var (
