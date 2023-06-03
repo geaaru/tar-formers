@@ -117,7 +117,7 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 	flags.Bool("stdin", false, "Read tar flow from stdin.")
 	flags.String("file", "", "Read tar flow from specified file.")
 	flags.String("compression", "",
-		"Specify tarball compression and ignoring extention of the file."+
+		"Specify tarball compression and ignoring extension of the file."+
 			" Possible values: gz|gzip|zstd|xz|bz2|bzip2|none.")
 
 	return cmd

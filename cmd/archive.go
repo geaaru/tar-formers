@@ -124,7 +124,7 @@ NOTE: Bzip2 compression is experimental.
 
 	flags := cmd.Flags()
 	flags.String("compression", "",
-		"Specify tarball compression and ignoring extention of the file."+
+		"Specify tarball compression and ignoring extension of the file."+
 			" Possible values: gz|gzip|zstd|xz|bz2|bzip2|none.")
 	flags.String("specs", "", "Define a spec file with the rules to follow.")
 

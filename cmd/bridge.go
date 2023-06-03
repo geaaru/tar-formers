@@ -176,7 +176,7 @@ $> tar-formers bridge --stdin --file /input.tar --to /tmp/file.tar.xz --out spec
 	flags.String("file", "", "Read tar flow from specified file.")
 	flags.String("to", "", "File where write the tar flow. Use - for stdout.")
 	flags.String("compression", "",
-		"Specify tarball compression and ignoring extention of the file."+
+		"Specify tarball compression and ignoring extension of the file."+
 			" Possible values: gz|gzip|zstd|xz|bz2|bzip2|none.")
 
 	return cmd
