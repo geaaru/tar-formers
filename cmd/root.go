@@ -58,7 +58,6 @@ func initConfig(config *specs.Config) {
 	config.Viper.SetConfigName(specs.TARFORMERS_CONFIGNAME)
 
 	config.Viper.SetTypeByDefaultValue(true)
-
 }
 
 func version() string {
@@ -83,6 +82,7 @@ func initCommand(rootCmd *cobra.Command, config *specs.Config) {
 		newBridgeCommand(config),
 		newDockerExportCommand(config),
 		newDockerImportCommand(config),
+		newDockerCpCommand(config),
 		newPortalCommand(config),
 		newArchiveCommand(config),
 	)
@@ -122,6 +122,9 @@ func Execute() {
 				panic(err)
 			}
 
+			if config.GetGeneral().Debug {
+				config.GetLogging().Level = "debug"
+			}
 			logger := log.NewLogger(config)
 			logger.SetAsDefault()
 		},
