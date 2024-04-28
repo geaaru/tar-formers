@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/dsnet/compress v0.0.1
-	github.com/klauspost/compress v1.17.0
+	github.com/klauspost/compress v1.17.8
 	github.com/klauspost/pgzip v1.2.6
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
