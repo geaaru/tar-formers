@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/geaaru/tar-formers)](https://goreportcard.com/report/github.com/geaaru/tar-formers)
 [![Build on push](https://github.com/geaaru/tar-formers/actions/workflows/push.yml/badge.svg)](https://github.com/geaaru/tar-formers/actions/workflows/push.yml)
 
-A library and tool to modify tar flows at runtime.
+A library and tool to modify tar flows/streams at runtime.
 
 The tool `tar-formers` was born to be a helpful tool for testing the
 library tar-formers that is mainly used by the [luet](https://github.com/geaaru/luet) the
@@ -12,10 +12,9 @@ But could be used as static binary for archiving the directories, and files in d
 compressions as an alternative to `tar` binary and apply renames, and filters at runtime.
 
 ```bash
-$> tar-formers --help
-Copyright (c) 2021-2023 - Daniele Rondina
+Copyright (c) 2021-2024 - Daniele Rondina
 
-Tar-formers - A golang tool to control tar flows
+Tar-formers - A golang tool to control tar flows/streams
 
 Usage:
    [command]
@@ -24,6 +23,7 @@ Available Commands:
   archive       Archive one or more directories to a tarball.
   bridge        Extract a stdin flow or an input tarball and bridge it to tar output stream or file.
   completion    Generate the autocompletion script for the specified shell
+  docker-cp     Copy files from a docker container path to a specified directory or to a file.
   docker-export Export the files a docker container to a specified directory or to a file.
   docker-import Create a docker image from a directory or a tarball.
   help          Help about any command
