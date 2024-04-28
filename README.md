@@ -61,6 +61,18 @@ $> tar-formers docker-export <container-id> --to /mycontaincer.tar.gz --specs sp
 
 The option `--to` accepts the `-` for write flow to stdout.
 
+## Copy files from a docker container to a directory and apply filter
+
+```bash
+$> tar-formers docker-cp <container-id> <container-src-path> --todir ./tmp --specs specs.yml
+```
+
+## Copy files from a docker container to a tarball and apply filter
+
+```bash
+$> tar-formers docker-cp <container-id> <container-src-path> --to /myfiles.tar.gz ./tmp --specs specs.yml
+```
+
 
 ## Create a docker image from with the content of a directory filtered
 
