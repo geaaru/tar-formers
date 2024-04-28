@@ -8,7 +8,7 @@ require (
 	github.com/klauspost/pgzip v1.2.6
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/logrusorgru/aurora v2.0.3+incompatible
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.18.2
 	github.com/ulikunitz/xz v0.5.11
 	go.uber.org/zap v1.24.0
