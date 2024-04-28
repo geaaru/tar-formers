@@ -29,11 +29,11 @@ import (
 )
 
 const (
-	cliName = `Copyright (c) 2021-2023 - Daniele Rondina
+	cliName = `Copyright (c) 2021-2024 - Daniele Rondina
 
-Tar-formers - A golang tool to control tar flows
+Tar-formers - A golang tool to control tar flows/streams
 `
-	TARFORMERS_VERSION = `0.8.2`
+	TARFORMERS_VERSION = `0.9.0`
 )
 
 var (
