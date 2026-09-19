@@ -40,7 +40,9 @@ type DockerImportArgs struct {
 }
 
 func importDockerContainer(tarformers *executor.TarFormers,
-	args *DockerImportArgs, dir, file, spec string) error {
+	args *DockerImportArgs, dir, file, spec string,
+	summary bool) error {
+
 	var s *specs.SpecFile = nil
 	var sReader *specs.SpecFile = nil
 	var err error
@@ -113,6 +115,10 @@ func importDockerContainer(tarformers *executor.TarFormers,
 			sReader = specs.NewSpecFile()
 			sReader.IgnoreFiles = append(sReader.IgnoreFiles, ".dockerenv")
 		}
+	}
+
+	if summary {
+		s.Summary = summary
 	}
 
 	hostCommand := exec.Command(cmds[0], cmds[1:]...)
@@ -205,6 +211,7 @@ $> tar-formers di geaaru/tar-formers:latest --file ./alpine.tar --platform amd64
 			message, _ := cmd.Flags().GetString("message")
 			platform, _ := cmd.Flags().GetString("platform")
 			changes, _ := cmd.Flags().GetStringArray("change")
+			summary, _ := cmd.Flags().GetBool("summary")
 
 			diargs := &DockerImportArgs{
 				Message:  message,
@@ -213,10 +220,15 @@ $> tar-formers di geaaru/tar-formers:latest --file ./alpine.tar --platform amd64
 				ImageTag: args[0],
 			}
 
-			err := importDockerContainer(tarformers, diargs, dir, file, specs)
+			err := importDockerContainer(tarformers, diargs, dir, file, specs, summary)
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(1)
+			}
+
+			if summary {
+				sum, _ := tarformers.GetSummary().YAML()
+				fmt.Println(string(sum))
 			}
 		},
 	}
