@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        go: ["1.20.x", "1.21.x"]
+        go: ["1.26.x" ]
     steps:
       - name: Install Go
         uses: actions/setup-go@v3
@@ -27,6 +27,11 @@ jobs:
         uses: goreleaser/goreleaser-action@v4
         with:
           install-only: true
+
+      - name: Get Golang Version
+        id: goversion
+        run: |
+          echo "GOVERSION=$(go env GOVERSION)" >> $GITHUB_ENV
 
       - name: Build test
         run: sudo -E env "PATH=$PATH" make goreleaser-snapshot
