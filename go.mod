@@ -10,7 +10,7 @@ require (
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	github.com/ulikunitz/xz v0.5.12
+	github.com/ulikunitz/xz v0.5.16
 	go.uber.org/zap v1.28.0
 	golang.org/x/sync v0.23.0
 	golang.org/x/sys v0.48.0
