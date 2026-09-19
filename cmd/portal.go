@@ -63,6 +63,7 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 			stdin, _ := cmd.Flags().GetBool("stdin")
 			file, _ := cmd.Flags().GetString("file")
 			compression, _ := cmd.Flags().GetString("compression")
+			summary, _ := cmd.Flags().GetBool("summary")
 
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
@@ -78,6 +79,10 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 			} else {
 				s = specs.NewSpecFile()
 				s.IgnoreFiles = append(s.IgnoreFiles, "/.dockerenv")
+			}
+
+			if summary {
+				s.Summary = summary
 			}
 
 			opts := tools.NewTarReaderCompressionOpts(compression == "")
@@ -108,6 +113,11 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 			}
 
 			fmt.Println("Operation completed.")
+
+			if summary {
+				sum, _ := tarformers.GetSummary().YAML()
+				fmt.Println(string(sum))
+			}
 		},
 	}
 
@@ -119,6 +129,7 @@ func newPortalCommand(config *specs.Config) *cobra.Command {
 	flags.String("compression", "",
 		"Specify tarball compression and ignoring extension of the file."+
 			" Possible values: gz|gzip|zstd|xz|bz2|bzip2|none.")
+	flags.Bool("summary", false, "Generate summary of the elaboration to stdout.")
 
 	return cmd
 }
