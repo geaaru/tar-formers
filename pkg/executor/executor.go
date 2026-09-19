@@ -163,7 +163,7 @@ func (t *TarFormers) RunTaskWriter(task *specs.SpecFile) error {
 	t.TaskWriter = task
 	t.TaskWriter.Prepare()
 
-	if t.Task.Summary {
+	if t.TaskWriter.Summary {
 		t.summary = specs.NewTaskSummary()
 	}
 
