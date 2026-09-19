@@ -32,7 +32,9 @@ import (
 )
 
 func exporDockerContainer(tarformers *executor.TarFormers,
-	cid, dir, file, spec, specOut string) error {
+	cid, dir, file, spec, specOut string,
+	summary bool) error {
+
 	var s *specs.SpecFile = nil
 	var sWriter *specs.SpecFile = nil
 	var err error
@@ -52,6 +54,10 @@ func exporDockerContainer(tarformers *executor.TarFormers,
 	} else {
 		s = specs.NewSpecFile()
 		s.IgnoreFiles = append(s.IgnoreFiles, ".dockerenv")
+	}
+
+	if summary {
+		s.Summary = summary
 	}
 
 	if specOut != "" {
@@ -167,17 +173,23 @@ $> tar-formers docker-export <container-id> --to /mycontainer.tar.gz --specs spe
 			todir, _ := cmd.Flags().GetString("todir")
 			specfile, _ := cmd.Flags().GetString("specs")
 			out, _ := cmd.Flags().GetString("out")
+			summary, _ := cmd.Flags().GetBool("summary")
 
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
 
 			err := exporDockerContainer(
 				tarformers, args[0], todir,
-				to, specfile, out)
+				to, specfile, out, summary)
 
 			if err != nil {
 				fmt.Println(err.Error())
 				os.Exit(1)
+			}
+
+			if summary {
+				sum, _ := tarformers.GetSummary().YAML()
+				fmt.Println(string(sum))
 			}
 
 		},
@@ -189,6 +201,7 @@ $> tar-formers docker-export <container-id> --to /mycontainer.tar.gz --specs spe
 	flags.String("specs", "", "Define a spec file with the rules to follow.")
 	flags.String("out", "",
 		"Define a spec file with the rules to follow for the writer. Only used with --to.")
+	flags.Bool("summary", false, "Generate summary of the elaboration to stdout.")
 
 	return cmd
 }
