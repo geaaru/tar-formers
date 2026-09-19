@@ -1,3 +1,5 @@
+version: 2
+
 builds:
   - env:
       - CGO_ENABLED=0
@@ -36,3 +38,6 @@ changelog:
       - '^test:'
       - '^scripts:'
       - '^contrib'
+      - '^.github'
+      - '^.goreleaser'
+      - '^Makefile'
