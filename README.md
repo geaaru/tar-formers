@@ -12,7 +12,7 @@ But could be used as static binary for archiving the directories, and files in d
 compressions as an alternative to `tar` binary and apply renames, and filters at runtime.
 
 ```bash
-Copyright (c) 2021-2024 - Daniele Rondina
+Copyright © 2021-2026 Daniele Rondina <geaaru@macaronios.org>
 
 Tar-formers - A golang tool to control tar flows/streams
 
@@ -25,6 +25,7 @@ Available Commands:
   completion    Generate the autocompletion script for the specified shell
   docker-cp     Copy files from a docker container path to a specified directory or to a file.
   docker-export Export the files a docker container to a specified directory or to a file.
+  docker-flat   Create a flatten docker image from a source image.
   docker-import Create a docker image from a directory or a tarball.
   help          Help about any command
   portal        Extract a stdin flow or a tar file to a specified directory.
