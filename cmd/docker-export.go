@@ -31,7 +31,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func exporDockerContainer(tarformers *executor.TarFormers,
+func exportDockerContainer(tarformers *executor.TarFormers,
 	cid, dir, file, spec, specOut string,
 	summary bool) error {
 
@@ -178,7 +178,7 @@ $> tar-formers docker-export <container-id> --to /mycontainer.tar.gz --specs spe
 			// Check instance
 			tarformers := executor.NewTarFormers(config)
 
-			err := exporDockerContainer(
+			err := exportDockerContainer(
 				tarformers, args[0], todir,
 				to, specfile, out, summary)
 
