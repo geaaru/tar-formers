@@ -1,12 +1,11 @@
 # tar-formers
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/geaaru/tar-formers)](https://goreportcard.com/report/github.com/geaaru/tar-formers)
 [![Build on push](https://github.com/geaaru/tar-formers/actions/workflows/push.yml/badge.svg)](https://github.com/geaaru/tar-formers/actions/workflows/push.yml)
 
 A library and tool to modify tar flows/streams at runtime.
 
 The tool `tar-formers` was born to be a helpful tool for testing the
-library tar-formers that is mainly used by the [luet](https://github.com/geaaru/luet) the
+library tar-formers that is mainly used by the [anise](https://github.com/macaroni-os/anise) the
 [Macaroni OS](https://github.com/macaroni-os/) PMS.
 But could be used as static binary for archiving the directories, and files in different
 compressions as an alternative to `tar` binary and apply renames, and filters at runtime.
