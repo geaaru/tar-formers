@@ -267,20 +267,16 @@ func (t *TarFormers) HandlerTarBridgeFlow(
 			}
 		} else {
 
-			rename := t.Task.GetRename(name)
 			// Drop initial / for header name
-			if rename[0:1] == "/" {
-				name = rename[1:]
-			} else {
-				name = rename
+			name = strings.TrimPrefix(t.Task.GetRename(name), "/")
+			if name == "" {
+				continue
 			}
 			if linkName != "" {
-				rename = t.Task.GetRename(linkName)
-				// Drop initial /
-				if rename[0:1] == "/" {
-					linkName = rename[1:]
-				} else {
-					linkName = rename
+				// Drop initial / for linkName
+				linkName = strings.TrimPrefix(t.Task.GetRename(linkName), "/")
+				if linkName == "" {
+					return fmt.Errorf("empty hard link target after renaming %q", name)
 				}
 			}
 		}
