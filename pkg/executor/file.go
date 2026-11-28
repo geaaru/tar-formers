@@ -187,18 +187,9 @@ func (t *TarFormers) SetFileProps(path string, meta *specs.FileMeta, link bool) 
 		}
 	}
 
+	// archive/tar has already decoded PAX xattrs into meta.Xattrs.
 	if len(meta.Xattrs) > 0 {
 		for key, value := range meta.Xattrs {
-			err := t.SetXattrAttr(path, key, value, 0)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	if len(meta.PAXRecords) > 0 {
-		// NOTE: using PAX extend header like xattr. To verify.
-		for key, value := range meta.PAXRecords {
 			err := t.SetXattrAttr(path, key, value, 0)
 			if err != nil {
 				return err
